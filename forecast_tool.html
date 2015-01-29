@@ -1,0 +1,299 @@
+<html lang="en">
+  <head>
+  
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Seasonal Forecast</title>
+
+	<!-- Bootstrap -->
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="custom_style.css" rel="stylesheet">
+	<link rel="stylesheet" href="jquery_ui/jquery-ui.css">
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+  </head>
+
+  <body>
+  <div id="main_content">
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="glyphicon glyphicon-list"></span>
+
+          </button>
+	  <img class="navbar-brand" src="page_images/MO_Landscape_W.png">
+          <strong class="navbar-brand">Forecast PDF</strong>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a id="settings">Settings</a></li>
+          </ul>
+          <ul class="nav navbar-nav pull-right">
+            <li class="active"><a href="forecast_tool.html">Forecast</a></li>
+	    <li><a href="help.html">Help</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div><!--/.container -->
+    </nav>
+
+<div class="container-fluid">
+    <div class="row">
+
+      <div class="col-sm-4 col-md-4 main text-center" id="pdf_plot">
+      </div>
+
+      <div class="col-sm-2 col-md-2 main text-center" id="data_display">
+	<font size="6">Data</font>
+	<div class="row">
+	  <div class="col-sm-3 col-md-3">
+	    <font size="2"><b>Raw</b></font><br>
+	    <div id="raw_fcast"></div>
+	  </div>
+	  <div class="col-sm-4 col-md-4">
+	    <font size="2"><b>Modified</b></font><br>
+	    <div id="mod_fcast"></div>
+	  </div>
+	  <div class="col-sm-5 col-md-5">
+	    <font size="2"><b>Overwrite</b></font><br>
+	    <div id="overwrite"></div>
+	  </div>
+	</div>
+      </div>
+
+      <div class="col-sm-5 col-md-5 main">
+	<div class"row">
+	  <div class="col-sm-12 col-md-12 text-center">
+	    <h3 id="page_title">Press Import to start</h3>
+	  </div>
+	</div>
+	<br>
+	<hr><br>
+	<div class"row">
+
+	  <div class="col-sm-4 col-md-4">
+	    <div class="row">
+	      <div class="col-sm-7 col-md-7">
+		<font size="5">Spread</font>
+	      </div>
+	      <div class="col-sm-4 col-md-4">
+		<input class="adj_input" size="3" value=1 name="spread">
+	      </div>
+	    </div>
+	    <div class="row">
+	      <div class="col-sm-7 col-md-7">
+		<font size="5">Shift</font>
+	      </div>
+	      <div class="col-sm-4 col-md-4">
+		<input class="adj_input" size="3" value=0 name="shift">
+	      </div>
+	    </div>
+	    <div class="row">
+	      <div class="col-sm-7 col-md-7">
+		<font size="5">Blend&nbsp;</font><font size="4">(%)</font>
+	      </div>
+	      <div class="col-sm-4 col-md-4">
+		<input class="adj_input" size="3" value=0 name="blend">
+	      </div>
+	    </div>
+	    <br>
+	    <button id='update' type="button" class="btn btn-success btn-lg">Update</button><br><br>
+	  </div>
+
+	  <div class="col-sm-8 col-md-8">
+	    <div class="row">
+	      <div class="col-sm-offset-6 col-md-offset-6 col-sm-3 col-md-3">
+		<br>
+		<button id='import_data' type="button" class="btn btn-primary btn-lg">Import</button>
+	      </div>
+	      <div class="col-sm-3 col-md-3 ">
+		<br>
+		<button id='export_data' type="button" class="btn btn-danger btn-lg">Export</button>
+	      </div>
+	    </div>
+
+	    <div class="row">
+	      <div class="col-sm-3 col-md-3">
+		<br>
+		<button id='mon_temp' type="button" value="mon_t2m" class="btn btn-default btn data_select">1M Temp</button>
+	      </div>
+	      <div class="col-sm-3 col-md-3 ">
+		<br>
+		<button id='mon_precip' type="button" value="mon_precip" class="btn btn-default btn data_select">1M Precip</button>
+	      </div>
+	      <div class="col-sm-3 col-md-3">
+		<br>
+		<button id='seas_temp' type="button" value="seas_t2m" class="btn btn-default btn data_select">3M Temp</button>
+	      </div>
+	      <div class="col-sm-3 col-md-3 ">
+		<br>
+		<button id='seas_precip' type="button" value="seas_precip" class="btn btn-default btn data_select">3M Precip</button>
+	      </div>
+	    </div>
+
+	  </div>
+
+	</div>
+      </div>
+      <div class"row">
+	<br>
+	<div class="col-sm-12 col-md-12 text-center" id="prob_chart_area">
+	  <div id="prob_chart_title_area"><font size="5" id="prob_chart_title"></font><br></div>
+	  <div id="prob_chart"></div>
+	</div>
+      </div>
+    </div>
+
+</div>
+
+<div id="import_form" title="Import Data">
+  <p id="import_tips"></p>
+  <form>
+    <fieldset>
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label for="month">Month</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  <select name="month" id="month">
+	    <option value="Jan">January</option>
+	    <option value="Feb">February</option>
+	    <option value="Mar">March</option>
+	    <option value="Apr">April</option>
+	    <option value="May">May</option>
+	    <option value="Jun">June</option>
+	    <option value="Jul">July</option>
+	    <option value="Aug">August</option>
+	    <option value="Sep">September</option>
+	    <option value="Oct">October</option>
+	    <option value="Nov">November</option>
+	    <option value="Dec">December</option>
+	  </select>
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label for="year">Year</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  <input type="text" name="year" id="year" placeholder="YYYY" class="text ui-widget-content ui-corner-all" style="width:50px">
+	</div>
+      </div>
+      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<div id="setting_form" title="Settings">
+  <p id="setting_tips"></p>
+  <form>
+    <fieldset>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>Quintile boundaries</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  <input type="radio" name="boundaries" value="pdf" id="pdf"> From climatology PDF<br>
+	  <input type="radio" name="boundaries" value="data" id="data"> From climatology values
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>Kernal bandwidth</label>
+	</div>
+	<div class="col-sm-3 col-md-3">
+	  <input type="radio" name="bandwidth" value="silverman" id="silverman" checked> Silverman<br>
+	  <input type="radio" name="bandwidth" value="scott" id="scott"> Scott
+	</div>
+	<div class="col-sm-5 col-md-5">
+	  or specify width <input type="text" name="given_bandwidth" style="width:40px"> 
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>PDF range limiter</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  <input type="text" name="range_limiter" style="width:40px">
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>PDF plotting levels</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  <input type="text" name="levels" style="width:40px">
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>Probability plot</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  <input type="radio" name="prob_plot" value="bar" id="bar"> Bar chart<br>
+	  <input type="radio" name="prob_plot" value="pie" id="pie"> Pie chart
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-12 col-md-12">
+	  <label>The following options must be set before data is imported.</label>
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>Climatology period</label>
+	</div>
+	<div class="col-sm-8 col-md-8">
+	  From <input type="text" name="clim_from" placeholder="YYYY" style="width:50px">
+	  To <input type="text" name="clim_to" placeholder="YYYY" style="width:50px">
+	</div>
+      </div>
+
+      <div class="row form">
+	<div class="col-sm-4 col-md-4">
+	  <label>Raw data only</label>
+	</div>
+	<div class="col-sm-3 col-md-3">
+	  <input type="checkbox" name="raw_data">
+	</div>
+      </div>
+
+
+      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+</div>
+<div id="loading"></div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="jquery_ui/jquery-ui.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="flot/jquery.flot.js"></script>
+    <script src="flot/jquery.flot.symbol.js"></script>
+    <script src="flot/jquery.flot.pie.js"></script>
+    <script src="flot/jquery.flot.axislabels.js"></script>
+    <script src="js/tool_functions.js"></script>
+    
+
+  </body>
+</html>

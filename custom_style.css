@@ -1,0 +1,118 @@
+#pdf_plot {
+  height: 60em;
+  margin-left: 10px;
+}
+
+#prob_chart_area {
+  width: 40em;
+}
+
+#prob_chart {
+  width: 40em;
+  height: 30em;
+  margin-left: 2em;
+}
+
+#prob_chart_title_area {
+  margin-top: 4em;
+  margin-left: 8em;
+}
+
+#data_display {
+  padding-bottom: 8px;
+  border: 1px solid #eee;
+}
+
+#settings:hover {
+  cursor:pointer;
+}
+
+#overlay {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+#box_frame {
+  width: 100%;
+  position: fixed;
+  top: 30%;
+}
+
+#box {
+  width: 400px;
+  padding: 10px;
+  margin: auto;
+  background-color: #f7f7f7;
+  border: 3px solid black;
+  font-size: 24px;
+}
+
+.main {
+  margin-top: 60px;
+}
+
+.data_select {
+  width: 6em;
+}
+
+.btn-lg {
+  width: 4.5em;
+}
+
+.adj_input {
+  margin-top: 7px;
+}
+
+.form {
+  padding: 5px;
+}
+
+.overwrites {
+  height: 20px;
+  width: 55px
+}
+
+.help_main {
+  position: static;
+  top: 52px;
+  font-size: 17;
+}
+
+.help_img {
+  width: 60em;
+  border: 1px solid #eee;
+}
+
+.help_img_sm {
+  height: 33em;
+  border: 1px solid #eee;
+}
+
+.help_img_xsm {
+  height: 20em;
+  border: 1px solid #eee;
+}
+
+.help_content {
+  top: 52px;
+}
+
+.sidebar {
+  position: fixed;
+  top: 52px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  padding-left: 20px;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  border-right: 1px solid #eee;
+}
+.sidebar ul {
+  font-size: 22;
+  margin-left: 20px;
+  padding-left: 0px;
+}

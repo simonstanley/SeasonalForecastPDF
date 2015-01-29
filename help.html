@@ -1,0 +1,177 @@
+<html lang="en">
+  <head>
+  
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Seasonal Forecast - Help</title>
+
+	<!-- Bootstrap -->
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="custom_style.css" rel="stylesheet">
+	<link rel="stylesheet" href="jquery_ui/jquery-ui.css">
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+  </head>
+
+  <body>
+  <div id="main_content">
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="glyphicon glyphicon-list"></span>
+
+          </button>
+	  <img class="navbar-brand" src="page_images/MO_Landscape_W.png">
+          <strong class="navbar-brand">Forecast PDF</strong>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav pull-right">
+            <li><a href="forecast_tool.html">Forecast</a></li>
+	    <li class="active"><a href="help.html">Help</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div><!--/.container -->
+    </nav>
+
+<div class="container-fluid help_main">
+    <div class="row">
+        <div class="col-sm-2 col-md-2 sidebar">
+	    <h1>Contents</h1><br>
+	    <ul>
+	      <li><a href="#introduction">Introduction</a></li>
+	      <li><a href="#getting_started">Getting started</a></li>
+	      <li><a href="#import">Import data</a></li>
+	      <li><a href="#displayed">What's displayed</a></li>
+	      <ul>
+		<li><a href="#pdf">PDF plot</a></li>
+		<li><a href="#data">Data</a></li>
+		<li><a href="#probs">Forecast probabilities</a></li>
+		<li><a href="#data_tabs">Data tabs</a></li>
+	      </ul>
+	      <li><a href="#modify">Modifing data</a></li>
+	      <li><a href="#settings">Settings</a></li>
+	      <li><a href="#export">Exporting</a></li>
+	    </ul>
+        </div>
+
+        <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 help_content">
+	    <h1 id="introduction">Introduction</h1><br>
+	    <p>The purpose of this tool is to create and modify probability density functions (PDFs) of the monthly and seasonal forecasts.<br>
+	    This help page will guide you through how to use each of the capabilities.
+	    </p><br>
+
+	    <h1 id="getting_started">Getting started</h1><br>
+	    <p>In most cases, it is normal to get started straight away by <a href="#import">importing</a> data. However, it may be worth checking the <a href="#settings">settings</a> before hand (particularly the climatological period as this can not be updated once the data has been imported).
+	    </p><br>
+
+	    <h1 id="import">Import data</h1><br>
+	    <p>Start by clicking <button type="button" class="btn btn-primary btn-xs">Import</button>. This opens a new window where you can select which data to import.</p>
+	    <img src="page_images/import_window.png" style="{width:15em;border:1px solid #eee}"><br><br>
+	    <p>There are 2 options:</p>
+	    <ul>
+	      <li><b>Month</b> - This must be the month in which the forecast is issued - which is always the month before the first forecasted month. For example, a forecast for the 3 month period from January to March (JFM) is issued in December, therefore December must be selected.</li>
+	      <li><b>Year</b> - Like with the month, this must be the year the forecast was issued. If in the example above JFM was in the year 2014, the issue month would be December 2013, therefore 2013 must be given.</li>
+	    </ul>
+	    <p>Once you are happy with your selection, press <button type="button" class="btn btn-default btn-xs">Get Data</button> to import the data.</p>
+
+	    <h1 id="displayed">What's displayed</h1><br>
+	    <p>Once the data has been imported, the page should look something like this...</p>
+	    <img src="page_images/main_screen.png" class="help_img"><br><br>
+	    <p>Let's look at the main features more closely...</p>
+
+	    <h3 id="pdf">PDF plot</h3>
+	    <p>The following image provides an overview of the data displayed on the PDF plot.</p>
+	    <img src="page_images/pdf_plot.png" class="help_img_sm"><br><br>
+	    <ul>
+	      <li><b>Climatology</b> - These are the observations from a given set of years, for the forecasted period. They are used as a reference to the normal conditions of the period at a particular location (the UK in this case). In this example, 30 years (1981-2010) are used. The climatological period can be changed in <a href="#settings">settings</a>.</li>
+	      <li><b>Last 10 years</b> - These are the observations from the last 10 years for the forecasted period.</li>
+	      <li><b>Forecast members</b> - These are the bias corrected forecast members which the model has produced. If <a href="#modify">modification</a> is done, these point will shift.</li>
+	      <li><b>Forecast PDF</b> - This is the PDF calculated from the forecast members.</li>
+	      <li><b>Climatology PDF</b> - This is the PDF calculated from the climatology.</li>
+	      <li><b>Quintile boundaries</b> - These are the boundaries which split the climatology into 5 equally sized bins. <i>Note, the boundaries can be calculated by equally splitting either the actual climatology values or the area under the climatology PDF. The prefered method can be selected in <a href="#settings">settings</a>.</i></li>
+	    </ul>
+	    <p>The plot can also be interacted with. Hovering over a climatology or last 10 year point will reveal its value and year. Hovering over a forecast member or a quintile boundary (where it meets the right axis) will reveal its value.</p><br>
+
+	    <h3 id="data">Data</h3>
+	    <p>The data section contains 3 columns.</p>
+	    <img src="page_images/data.png" class="help_img_sm"><br><br>
+	    <ul>
+	      <li><b>Raw</b> - These values will never change, they are the forecast values as they are imported.</li>
+	      <li><b>Modified</b> - These are the values which are plotted and exported. They are the resulting forecast values after all <a href="#modify">modification</a>.</li>
+	      <li><b>Overwrite</b> - Here is where one method of modification can be performed. By entering a value into a text box (and pressing <button type="button" class="btn btn-success btn-xs">Update</button>), the corresponding forecast value will be overwritten (the Modified column will update). <i>Note, to reset the value, clear the text box and press </i><button type="button" class="btn btn-success btn-xs">Update</button>.</li>
+	    </ul><br>
+	    
+	    <h3 id="probs">Forecast probabilities</h3>
+	    <p>The percentage of the forecast PDF that falls into each of the 5 categories (defined by the quintile boundaries) represents the resulting forecast probability for each category. By default, this information is displayed in a bar chart...</p>
+	    <img src="page_images/bar.png" class="help_img_xsm"><br><br>
+	    <p>The option to display the probabilities in a pie chart is also available and can be selected in <a href="#settings">settings</a>.</p>
+	    <img src="page_images/pie.png" class="help_img_xsm"><br><br>
+	    <p>A forecast of climatology (normal) would put 20% into each category. By comparing a forecasted percentage with this normal 20%, a category can be defined to have a raised or reduced probability of occurring.
+	    </p><br>
+
+	    <h3 id="data_tabs">Data tabs</h3>
+	    <p>There are 4 tabs to switch between.</p>
+	    <img src="page_images/data_tabs.png" style="{width:25em;border:1px solid #eee}"><br><br>
+	    <p>Clicking a tab imports the given period and variable. Any modifications made on one tab are saved locally when switching to another. This means, if returning to a tab, any previous modifications are reimplemented so you can carry on where you left off.</p>
+	    <p><i>Note, data is only saved to file when </i><button type="button" class="btn btn-danger btn-xs">Export</button><i> is pressed. Remodifying can still be done after this and re-exporting will simply overwrite the previous saved data.</i></p>
+
+
+	    <h1 id="modify">Modifing data</h1><br>
+	    <p>There are 4 ways in which to modify the forecast data directly.</p>
+	    <img src="page_images/modify.png" class="help_img"><br><br>
+	    <ul>
+	      <li><b>Spread</b> - Increase or decrease the spread of the forecast values. Each value's distance from the mean is multiplied by the given spread value (meaning negative values can be used to invert the forecast, but hopefully that is never needed!).</li>
+	      <li><b>Shift</b> - Shift all forecast values by the given amount.</li>
+	      <li><b>Blend</b> - Blend the forecast values towards the climatological distribution. How much to blend is chosen by giving a percentage. This works by calculating how much shift and spread are needed to move the forecast values towards a climatological distribution of 20% in each category. <i>Note, blend takes priority over shift and spread. For example, if 100% blend was given, any values in shift and spread would have no effect (as these would then move the forecast distribution away from climatology).</i></li>
+	      <li><b>Overwrite</b> - Any forecast value can be overwritten (see <a href="#data">Data</a> for more details). Overwrite takes priority over all other modifications meaning the given value will not change.</li>
+	    </ul>
+	    <p>After selecting any combination of modification, press <button type="button" class="btn btn-success btn-xs">Update</button> to implement the changes. The update will change the forecast values in some way, and this change is reflected on the <a href="#pdf">PDF plot</a> and in the 'Modified' column of <a href="#data">Data</a>. To reset any modifications to their default (i.e. having no effect) just clear its text box.</p><br>
+
+	    <h1 id="settings">Settings</h1><br>
+	    <p>To access the settings, click the link at the top of the page...</p>
+	    <img src="page_images/settings_button.png" style="{width:25em;border:1px solid #eee}"><br><br>
+	    <p>This will open a new window where the settings can be changed.</p>
+	    <img src="page_images/settings.png" class="help_img_xsm"><br><br>
+	    <p>There are 7 settings that can be changed.</p>
+	    <ul>
+	      <li><b>Quintile boundaries</b> - Choose whether the quintile boundaries are calculated by equally splitting the area under the climatology PDF or equally splitting the climatology values.</li>
+	      <li><b>Kernal bandwidth</b> - The PDFs are created by converting each value/member into a Gaussian distribution. These distributions are called the kernals and are summed together to create the final PDF. Changing the kernal distributions changes the PDF. The bandwidth of a kernal refers simply to its spread. A large bandwidth results in kernal distributions with wide tails, which results in a smoother (and wider) PDF. 
+	      Small bandwidths mean taller and thinner kernals, which means a more detailed but less smooth PDF. There are 3 choices in bandwidth selection:
+	      <ul>
+		<li><b>Silverman</b> - The bandwidth is calculated for you using Silverman's rule (Silverman, 1986).</li>
+		<li><b>Scott</b> - The bandwidth is calculated using Scott's rule (Scott, 1992).</li>
+		<li><b>Specify width</b> - Enter a specific value, this is useful if direct comparisons with other forecasts need to be made.</li>
+	      </ul>
+	      </li>
+	      <li><b>PDF range limiter</b> - This value is used to determine where to stop drawing the PDF tails. The given value is used to calculate how close to 0 the PDF must be to stop (the PDF theoretically never reaches 0). The larger the value, the closer to 0, meaning the PDF will extend further, increasing the range. Changing this has no effect on probabilities, only how the PDF looks, so feel free to experiment.</li>
+	      <li><b>PDF plotting levels</b> - A PDF is a function. To plot it, x values must be given to the function to produce y values. The number of plotting levels is simply how many x values are fed to the function along the range. The more levels, the smoother the plot will look. Like with the range limiter (above), this only affects the visual (as any calculations use the actual function, not these xy values).</li>
+	      <li><b>Probability plot</b> - Choose whether to display the resulting forecast probabilities on a bar chart (default) or pie chart.</li>
+	      <li><b>Climatology period</b> - Choose the period which acts as the reference to normal conditions. In general a 30 year period is large enough to represent the true spread and small enough to exclude any trends.</li>
+	      <li><b>Raw data only</b> - If ticked (default), only data before any previous modification is read in. If unticked, the lastest version of data is read in, i.e. if data has been previously modified, this version is imported - with no reference to the unmodified data - if no modified data exists, raw data is imported.</li>
+	    </ul>
+	    <p><i>Note, all but the climatology period and the raw data only option can be changed and updated after loading in the data, use </i><button type="button" class="btn btn-success btn-xs">Update</button><i> to implement the changes.</i></p><br>
+
+	    <h1 id="export">Exporting</h1><br>
+	    <p>Once you are happy with a forecast, simply press <button type="button" class="btn btn-danger btn-xs">Export</button> and the data for that variable and period (given by the current <a href="#data_tabs">data tab</a>) will be saved to file. The file location is then displayed on screen.</p><br>
+	    
+        </div>
+
+
+
+    </div>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>

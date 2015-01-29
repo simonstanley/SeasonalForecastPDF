@@ -1,0 +1,147 @@
+<html lang="en">
+  <head>
+  
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Seasonal Forecast - Technical Help</title>
+
+	<!-- Bootstrap -->
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link href="custom_style.css" rel="stylesheet">
+	<link rel="stylesheet" href="jquery_ui/jquery-ui.css">
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+  </head>
+
+  <body>
+  <div id="main_content">
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="glyphicon glyphicon-list"></span>
+
+          </button>
+	  <img class="navbar-brand" src="page_images/MO_Landscape_W.png">
+          <strong class="navbar-brand">Forecast PDF</strong>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav pull-right">
+            <li><a href="forecast_tool.html">Forecast</a></li>
+	    <li class="active"><a href="help.html">Help</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div><!--/.container -->
+    </nav>
+
+<div class="container-fluid help_main">
+    <div class="row">
+        <div class="col-sm-2 col-md-2 sidebar">
+	    <h1>Contents</h1><br>
+	    <ul>
+	      <li><a href="#introduction">Introduction</a></li>
+	      <li><a href="#run_tool">Running the tool</a></li>
+	      <li><a href="#code">The code</a>
+		<ul>
+		  <li><a href="#structure">Structure</a></li>
+		  <li><a href="#javascript">JavaScript code</a></li>
+		  <li><a href="#python">Python code</a></li>
+		  <li><a href="#debugging">Debugging</a></li>
+		</ul>
+	      </li>
+	    </ul>
+        </div>
+
+        <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 help_content">
+
+	    <h1 id="introduction">Introduction</h1><br>
+	    <p>This help page is a techinical guide to running and maintaining the forecast PDF tool. 
+            The tool is written in Python2.7 so knowledge of the language will help a great deal in fixing or changing how the tool works.
+            Note, the tool relies on data only accessible from within the Met Office, it will not work outside the building.
+	    </p><br>
+
+
+	    <h1 id="run_tool">Running the tool</h1><br>
+	    <p>All the code for the tool is self contained in a folder called SeasonalForecastPDF. This is located here (at the time of writing):<br><br>
+	    /net/home/h02/sstanley/packages/SeasonalForecastPDF/<br><br>
+	    To run the Python scripts which fetch the data, the page requires a server. As it happens, Python has a module which turns any computer into a simple server, perfect for these purposes.<br>
+            To get the server running, follow these steps:</p><br>
+	    <ol>
+	      <li><p>Open up a terminal and move to the tool's directory. This is the above directory unless it has been moved.</p>
+	      <p style='font-family:"Courier New", Courier, monospace'>cd /net/home/h02/sstanley/packages/SeasonalForecastPDF/</p></li>
+
+	      <li><p>Then run:</p>
+	      <p style='font-family:"Courier New", Courier, monospace'>python2.7 -m CGIHTTPServer 8000</p>
+              <p><i>Note, the final number (8000) is the port number and can be changed to any 4 digit number higher than 1000. It is usual to use 8000 but if a port is already in use try another.</i></p></li>
+
+	      <li><p>You should get a message something like "Serving HTTP on 0.0.0.0 port 8000 ...". This terminal is now the acting server and must not be closed or stopped whilst running the tool.</p></li>
+
+	      <li><p>You can now access the tool via the browser with an address like this:</p>
+              <p><i>http://eldxxx:8000/forecast_tool.html</i></p>
+	      <p>"eldxxx" must be replaced with the machine number running the server (this is your machine unless you've ssh'd somewhere else), and ":8000" refers to the port number so if you chose another (in step 2), change this to match.</p></li>
+	    </ol><br>
+
+	    <h1 id="code">The code</h1><br>
+	    <p>Here we take a closer look at the code running all this. The aim is to provide a clear understanding of what each bit does and how it all fits together giving you a good idea of where to look if something goes wrong.
+	    </p><br>
+
+	    <h3 id="structure">Structure</h3><br>
+	    <p>This diagram represents the overall code structure.</p>
+	    <img src="page_images/code_structure.png" class="help_img_sm"><br><br>
+	    <p>Let's take a general look at what each of the files do. File paths are given from the SeasonalForecastPDF/ directory.</p>
+	    <ul>
+	      <li><b>forecast_tool.html</b> (along with <b>custom_style.css</b>) - These do the page formatting. Uses <a href="http://getbootstrap.com/" target="_blank">bootstrap</a>.</li><br>
+	      <li><b>js/tool_functions.js</b> - This is written using <a href="http://jquery.com/" target="_blank">jQuery</a>. It has a 2 jobs:
+	      <ol>
+		<li>Makes the page dynamic, i.e. handles button pressing, window pop ups and animations.</li>
+		<li>Sends relevant data (e.g. forecast issue date) from the page, to the Python script <i>forecast_handler.py</i>. It also recieves the returned data and plots it (using <a href="http://www.flotcharts.org/" target="_blank">flot</a>).</li>
+	      </ol>
+	       We look closer at this in the <a href="#javascript">JavaScript</a> section.
+	      </li><br>
+	      <li><b>cgi-bin/forecast_handler.py</b> - This is where most of the work is done. It can do one of three jobs: load, modify or export data. When <i>tool_functions.js</i> sends data from the tool (via <a href="http://www.json.org/" target="_blank">JSON</a>), 
+              it specifies which of these jobs it needs to do.
+              We look closer at this module in the <a href="#python">Python</a> section.</li><br>     
+              <li><b>cgi-bin/DataSets.py</b> - This module contains two classes:
+		<ol>
+		  <li>IssuedForecastData - for retrieving UK forecast data.</li>
+		  <li>NCICTextData - for retrieving NCIC observations. This is used by the IssuedForecastData class to calculate climatologies.</li>
+		</ol>
+              <i>forecast_handler.py</i> imports IssuedForecastData and uses it to handle all data collection from source.
+	      </li><br>
+	      <li><b>cgi-bin/stats_functions.py</b> - This just contains pre-written statistical functions such as PDF probability calculaters. <i>forecast_handler.py</i> imports all the functions from this it needs.</li><br>
+
+	    </ul>
+
+	    <h3 id="javascript">JavaScript</h3><br>
+	    <p>
+	    </p><br>
+
+	    <h3 id="python">Python</h3><br>
+	    <p>
+	    </p><br>
+
+	    <h3 id="debugging">Debugging</h3><br>
+	    <p>
+	    </p><br>
+
+        </div>
+
+
+
+    </div>
+</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+</html>
