@@ -1,6 +1,6 @@
 <html lang="en">
   <head>
-  
+
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +36,8 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav pull-right">
             <li><a href="forecast_tool.html">Forecast</a></li>
-	    <li class="active"><a href="help.html">Help</a></li>
+            <li><a href="user_guide.html">User Guide</a></li>
+            <li class="active"><a href="tech_help.html">Technical Help</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div><!--/.container -->
@@ -48,12 +49,13 @@
 	    <h1>Contents</h1><br>
 	    <ul>
 	      <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#set_up">Set up</a></li>
 	      <li><a href="#run_tool">Running the tool</a></li>
 	      <li><a href="#code">The code</a>
 		<ul>
 		  <li><a href="#structure">Structure</a></li>
-		  <li><a href="#javascript">JavaScript code</a></li>
-		  <li><a href="#python">Python code</a></li>
+		  <li><a href="#javascript">JavaScript</a></li>
+		  <li><a href="#python">Python</a></li>
 		  <li><a href="#debugging">Debugging</a></li>
 		</ul>
 	      </li>
@@ -63,10 +65,22 @@
         <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 help_content">
 
 	    <h1 id="introduction">Introduction</h1><br>
-	    <p>This help page is a techinical guide to running and maintaining the forecast PDF tool. 
+	    <p>This help page is a techinical guide to running and maintaining the forecast PDF tool.
             The tool is written in Python2.7 so knowledge of the language will help a great deal in fixing or changing how the tool works.
             Note, the tool relies on data only accessible from within the Met Office, it will not work outside the building.
 	    </p><br>
+
+      <h1 id="set_up">Set up</h1>
+      <p>There is a very basic set up required to make sure the tool is reading and writing with the correct folders.
+      At the top of the file <i>cgi-bin/forecast_handler.py</i> (found in the SeasonalForecastPDF directory. See <a href="#run_tool">below</a> for more details), directly under the imports, there are 3 directories to specify:
+      </p>
+      <ol>
+        <li><b>import_directory</b> - This is the only directory that MUST be correct. The tool loads all the initial data from this directory and expects a very specific file format. At time of writing, this folder is:<br><br>
+        /home/h02/frgo/TEST/jhirst_plots/new_caboff_plots/plots_N216/</li><br>
+        <li><b>export_directory</b> - This is the directory where the outputs are saved. This can be any directory. <i>Note, when exporting with the tool, you are told exactly where the output files have beed saved, which will be the directory specified here.</i></li><br>
+        <li><b>temp_directory</b> - When building the output files, temporary files are created (and then deleted once not needed). Here you can specify which folder this is done in. A simple option is to set this to be the same as the export_directory.</li><br>
+      </ol>
+      <br>
 
 
 	    <h1 id="run_tool">Running the tool</h1><br>
@@ -89,6 +103,7 @@
 	      <p>"eldxxx" must be replaced with the machine number running the server (this is your machine unless you've ssh'd somewhere else), and ":8000" refers to the port number so if you chose another (in step 2), change this to match.</p></li>
 	    </ol><br>
 
+
 	    <h1 id="code">The code</h1><br>
 	    <p>Here we take a closer look at the code running all this. The aim is to provide a clear understanding of what each bit does and how it all fits together giving you a good idea of where to look if something goes wrong.
 	    </p><br>
@@ -96,19 +111,19 @@
 	    <h3 id="structure">Structure</h3><br>
 	    <p>This diagram represents the overall code structure.</p>
 	    <img src="page_images/code_structure.png" class="help_img_sm"><br><br>
-	    <p>Let's take a general look at what each of the files do. File paths are given from the SeasonalForecastPDF/ directory.</p>
+	    <p>Let's take a general look at what each of the files do. File paths are given from the SeasonalForecastPDF directory.</p>
 	    <ul>
-	      <li><b>forecast_tool.html</b> (along with <b>custom_style.css</b>) - These do the page formatting. Uses <a href="http://getbootstrap.com/" target="_blank">bootstrap</a>.</li><br>
+	      <li><b>forecast_tool.html</b> (along with <b>custom_style.css</b>) - These do the page formatting. Uses <a href="http://getbootstrap.com/" target="_blank">Bootstrap</a>.</li><br>
 	      <li><b>js/tool_functions.js</b> - This is written using <a href="http://jquery.com/" target="_blank">jQuery</a>. It has a 2 jobs:
 	      <ol>
 		<li>Makes the page dynamic, i.e. handles button pressing, window pop ups and animations.</li>
-		<li>Sends relevant data (e.g. forecast issue date) from the page, to the Python script <i>forecast_handler.py</i>. It also recieves the returned data and plots it (using <a href="http://www.flotcharts.org/" target="_blank">flot</a>).</li>
+		<li>Sends relevant data (e.g. forecast issue date) from the page, to the Python script <i>forecast_handler.py</i>. It also recieves the returned data and plots it (using <a href="http://www.flotcharts.org/" target="_blank">Flot</a>).</li>
 	      </ol>
 	       We look closer at this in the <a href="#javascript">JavaScript</a> section.
 	      </li><br>
-	      <li><b>cgi-bin/forecast_handler.py</b> - This is where most of the work is done. It can do one of three jobs: load, modify or export data. When <i>tool_functions.js</i> sends data from the tool (via <a href="http://www.json.org/" target="_blank">JSON</a>), 
+	      <li><b>cgi-bin/forecast_handler.py</b> - This is where most of the work is done. It can do one of three jobs: load, modify or export data. When <i>tool_functions.js</i> sends data from the tool (via <a href="http://www.json.org/" target="_blank">JSON</a>),
               it specifies which of these jobs it needs to do.
-              We look closer at this module in the <a href="#python">Python</a> section.</li><br>     
+              We look closer at this module in the <a href="#python">Python</a> section.</li><br>
               <li><b>cgi-bin/DataSets.py</b> - This module contains two classes:
 		<ol>
 		  <li>IssuedForecastData - for retrieving UK forecast data.</li>
@@ -129,9 +144,25 @@
 	    </p><br>
 
 	    <h3 id="debugging">Debugging</h3><br>
-	    <p>
+	    <p>There are two likely outcomes if an error occurs:</p>
+      <ol>
+        <li>The "importing" message box won't close - This, ironically, is likely to be an import error in the <i>cgi-bin/forecast_handler.py</i> script.
+          Assuming this is the case, it means the script can see one of the imports in its $PYTHONPATH.
+          See below to help solve this.</li><br>
+        <li>A (potentially strange) message appeared in the text area (top right) of the tool - This is the error message returned from the script.
+          Hopefully it says something sensible like "There is no data for the selected period", but if it is a bit more criptic,
+          see below to help solve this.</li><br>
+      </ol>
+      <p>The best first step to debug a problem is to run the <i>cgi-bin/forecast_handler.py</i> script manually (not using the tool), this way you get the full error traceback.
+        Here are the steps to run the script manually:
 	    </p><br>
-
+      <ol>
+        <li>Open the file <i>cgi-bin/forecast_handler.py</i></li><br>
+        <li>At the bottom of the file there is an "if __name__ == '__main__':" statement. For now just work within this statement.</li><br>
+        <li>To run the script manually you must comment out the code above "# Example JSONs for testing and debugging." and un-comment one of the example JSONs.
+          Which, depends on where the error occured, during importing, modifying or exporting?
+          If needed, the JSONs can be edited to replicate information the tool sent when the error occured.</li><br>
+      </ol>
         </div>
 
 

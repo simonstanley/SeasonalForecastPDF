@@ -1,10 +1,10 @@
 <html lang="en">
   <head>
-  
+
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Seasonal Forecast - Help</title>
+	<title>Seasonal Forecast - User Guide</title>
 
 	<!-- Bootstrap -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -36,7 +36,8 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav pull-right">
             <li><a href="forecast_tool.html">Forecast</a></li>
-	    <li class="active"><a href="help.html">Help</a></li>
+	          <li class="active"><a href="user_guide.html">User Guide</a></li>
+            <li><a href="tech_help.html">Technical Help</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div><!--/.container -->
@@ -66,7 +67,7 @@
         <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 help_content">
 	    <h1 id="introduction">Introduction</h1><br>
 	    <p>The purpose of this tool is to create and modify probability density functions (PDFs) of the monthly and seasonal forecasts.<br>
-	    This help page will guide you through how to use each of the capabilities.
+	    This user guide will guide you through how to use each of the capabilities.
 	    </p><br>
 
 	    <h1 id="getting_started">Getting started</h1><br>
@@ -109,7 +110,7 @@
 	      <li><b>Modified</b> - These are the values which are plotted and exported. They are the resulting forecast values after all <a href="#modify">modification</a>.</li>
 	      <li><b>Overwrite</b> - Here is where one method of modification can be performed. By entering a value into a text box (and pressing <button type="button" class="btn btn-success btn-xs">Update</button>), the corresponding forecast value will be overwritten (the Modified column will update). <i>Note, to reset the value, clear the text box and press </i><button type="button" class="btn btn-success btn-xs">Update</button>.</li>
 	    </ul><br>
-	    
+
 	    <h3 id="probs">Forecast probabilities</h3>
 	    <p>The percentage of the forecast PDF that falls into each of the 5 categories (defined by the quintile boundaries) represents the resulting forecast probability for each category. By default, this information is displayed in a bar chart...</p>
 	    <img src="page_images/bar.png" class="help_img_xsm"><br><br>
@@ -144,7 +145,7 @@
 	    <p>There are 7 settings that can be changed.</p>
 	    <ul>
 	      <li><b>Quintile boundaries</b> - Choose whether the quintile boundaries are calculated by equally splitting the area under the climatology PDF or equally splitting the climatology values.</li>
-	      <li><b>Kernal bandwidth</b> - The PDFs are created by converting each value/member into a Gaussian distribution. These distributions are called the kernals and are summed together to create the final PDF. Changing the kernal distributions changes the PDF. The bandwidth of a kernal refers simply to its spread. A large bandwidth results in kernal distributions with wide tails, which results in a smoother (and wider) PDF. 
+	      <li><b>Kernal bandwidth</b> - The PDFs are created by converting each value/member into a Gaussian distribution. These distributions are called the kernals and are summed together to create the final PDF. Changing the kernal distributions changes the PDF. The bandwidth of a kernal refers simply to its spread. A large bandwidth results in kernal distributions with wide tails, which results in a smoother (and wider) PDF.
 	      Small bandwidths mean taller and thinner kernals, which means a more detailed but less smooth PDF. There are 3 choices in bandwidth selection:
 	      <ul>
 		<li><b>Silverman</b> - The bandwidth is calculated for you using Silverman's rule (Silverman, 1986).</li>
@@ -162,7 +163,7 @@
 
 	    <h1 id="export">Exporting</h1><br>
 	    <p>Once you are happy with a forecast, simply press <button type="button" class="btn btn-danger btn-xs">Export</button> and the data for that variable and period (given by the current <a href="#data_tabs">data tab</a>) will be saved to file. The file location is then displayed on screen.</p><br>
-	    
+
         </div>
 
 
