@@ -54,8 +54,6 @@
 	      <li><a href="#code">The code</a>
 		<ul>
 		  <li><a href="#structure">Structure</a></li>
-		  <li><a href="#javascript">JavaScript</a></li>
-		  <li><a href="#python">Python</a></li>
 		  <li><a href="#debugging">Debugging</a></li>
 		</ul>
 	      </li>
@@ -77,7 +75,7 @@
       <ol>
         <li><b>import_directory</b> - This is the only directory that MUST be correct. The tool loads all the initial data from this directory and expects a very specific file format. At time of writing, this folder is:<br><br>
         /home/h02/frgo/TEST/jhirst_plots/new_caboff_plots/plots_N216/</li><br>
-        <li><b>export_directory</b> - This is the directory where the outputs are saved. This can be any directory. <i>Note, when exporting with the tool, you are told exactly where the output files have beed saved, which will be the directory specified here.</i></li><br>
+        <li><b>export_directory</b> - This is the directory where the outputs are saved. This can be any directory. <i>Note, when exporting with the tool, you are told exactly where the output files have beed saved, which will be in the directory specified here.</i></li><br>
         <li><b>temp_directory</b> - When building the output files, temporary files are created (and then deleted once not needed). Here you can specify which folder this is done in. A simple option is to set this to be the same as the export_directory.</li><br>
       </ol>
       <br>
@@ -119,11 +117,9 @@
 		<li>Makes the page dynamic, i.e. handles button pressing, window pop ups and animations.</li>
 		<li>Sends relevant data (e.g. forecast issue date) from the page, to the Python script <i>forecast_handler.py</i>. It also recieves the returned data and plots it (using <a href="http://www.flotcharts.org/" target="_blank">Flot</a>).</li>
 	      </ol>
-	       We look closer at this in the <a href="#javascript">JavaScript</a> section.
 	      </li><br>
 	      <li><b>cgi-bin/forecast_handler.py</b> - This is where most of the work is done. It can do one of three jobs: load, modify or export data. When <i>tool_functions.js</i> sends data from the tool (via <a href="http://www.json.org/" target="_blank">JSON</a>),
-              it specifies which of these jobs it needs to do.
-              We look closer at this module in the <a href="#python">Python</a> section.</li><br>
+              it specifies which of these jobs it needs to do.</li><br>
               <li><b>cgi-bin/DataSets.py</b> - This module contains two classes:
 		<ol>
 		  <li>IssuedForecastData - for retrieving UK forecast data.</li>
@@ -134,22 +130,16 @@
 	      <li><b>cgi-bin/stats_functions.py</b> - This just contains pre-written statistical functions such as PDF probability calculaters. <i>forecast_handler.py</i> imports all the functions from this it needs.</li><br>
 
 	    </ul>
-
-	    <h3 id="javascript">JavaScript</h3><br>
-	    <p>
-	    </p><br>
-
-	    <h3 id="python">Python</h3><br>
-	    <p>
-	    </p><br>
+	    <p>The best place to find out the more specific workings of each script is to look at the code itself.
+	    All code is documented and commented on (apart from <i>forecast_tool.html</i> and <i>custom_style.css</i>).</p><br>
 
 	    <h3 id="debugging">Debugging</h3><br>
 	    <p>There are two likely outcomes if an error occurs:</p>
       <ol>
-        <li>The "importing" message box won't close - This, ironically, is likely to be an import error in the <i>cgi-bin/forecast_handler.py</i> script.
-          Assuming this is the case, it means the script can see one of the imports in its $PYTHONPATH.
+        <li>The "importing" message box won't close - This, ironically, is likely to be an import error in the <i>forecast_handler.py</i> script.
+          Assuming this is the case, it means the script can not see one of the imports in its $PYTHONPATH.
           See below to help solve this.</li><br>
-        <li>A (potentially strange) message appeared in the text area (top right) of the tool - This is the error message returned from the script.
+        <li>A (potentially strange) message appeared in the text area (top right) of the tool - This is the error message returned from the <i>forecast_handler.py</i> script.
           Hopefully it says something sensible like "There is no data for the selected period", but if it is a bit more criptic,
           see below to help solve this.</li><br>
       </ol>
@@ -158,8 +148,8 @@
 	    </p><br>
       <ol>
         <li>Open the file <i>cgi-bin/forecast_handler.py</i></li><br>
-        <li>At the bottom of the file there is an "if __name__ == '__main__':" statement. For now just work within this statement.</li><br>
-        <li>To run the script manually you must comment out the code above "# Example JSONs for testing and debugging." and un-comment one of the example JSONs.
+        <li>At the bottom of the file there is an "if __name__ == '__main__':" statement.</li><br>
+        <li>To run the script manually you must comment out all the code inbetween "# Example JSONs for testing and debugging." and the "if __name__ == '__main__':" statement. Then un-comment one of the example JSONs.
           Which, depends on where the error occured, during importing, modifying or exporting?
           If needed, the JSONs can be edited to replicate information the tool sent when the error occured.</li><br>
       </ol>
