@@ -225,7 +225,7 @@ class LoadData(object):
     """
     def __init__(self, main_dir, variable, period, iss_month, iss_year,
                  clim_period=[1981, 2010], raw_data=False,
-                 export_dir_only=False, ='', export_dir=''):
+                 export_dir_only=False, export_dir=''):
 
         self.main_dir   = main_dir
         self.export_dir = export_dir

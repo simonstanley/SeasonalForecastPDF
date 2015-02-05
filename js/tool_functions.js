@@ -17,6 +17,11 @@ var clm_quintles = new Array();
 var lst_ten_vals = new Array();
 var lst_ten_yrs  = new Array();
 
+// Plots
+var bar_plot  = new Object();
+var pie_plot  = new Object();
+var data_plot = new Object();
+
 // Data parameters
 var variable = 't2m';
 var period = 'mon';
@@ -161,6 +166,31 @@ $(document).ready(function(){
 				setting_dialog.dialog("open");
 			});
 	
+	$(".dwnld_plt").click(
+			function(event)
+			{
+				var plot_id = (event.target.id);
+				if (plot_id == "dwnld_prob")
+				{
+					if (jQuery.isEmptyObject(pie_plot) == false)
+					{
+					      savePlot(pie_plot);
+					}
+					if (jQuery.isEmptyObject(bar_plot) == false)
+					{
+					      savePlot(bar_plot);
+					}
+				}
+				else if (plot_id == "dwnld_pdf")
+				{
+					savePlot(data_plot);
+				}
+				else
+				{
+					alert(plot_id);
+				}
+			});
+
 	//*****Dialog boxes*****\\
 	import_dialog = $("#import_form").dialog(
 			{
@@ -635,7 +665,7 @@ $(document).ready(function(){
 		var line_width = 0.4;
 		
 		// Plot the chart data
-		var data_plot = $.plot("#pdf_plot", 
+		data_plot = $.plot("#pdf_plot", 
 		[
 		    {
 		    	data: clm_pdf,
@@ -837,7 +867,7 @@ $(document).ready(function(){
 		{
 			var colors = ["#ff0000", "#ff8080", "#cccccc", "#8099E6", "#3366ff"];
 		}
-		var pie_plot = $.plot("#prob_chart", 
+		pie_plot = $.plot("#prob_chart", 
 		[
 		 	{
 		 		data: mod_probs[4],
@@ -897,7 +927,7 @@ $(document).ready(function(){
 		{
 			var colors = ["#ff0000", "#ff8080", "#cccccc", "#8099E6", "#3366ff"];
 		}
-		var bar_plot = $.plot($("#prob_chart"), 
+		bar_plot = $.plot($("#prob_chart"), 
 				[
 				 	{
 				 		data: [[4, mod_probs[4]]],
@@ -960,9 +990,9 @@ $(document).ready(function(){
 						ticks: yticks
 					},
 					legend:
-				    {
+					{
 						show: false
-				    }
+					}
 				 });
 		
 		// Add the probability value above each bar.
@@ -1009,6 +1039,15 @@ $(document).ready(function(){
 		}
 	}
 	
+	function savePlot(plot)
+	// Convert Flot image into a PNG and make downloadable.
+	{
+		var canvas = plot.getCanvas();
+		var image = canvas.toDataURL();
+		image = image.replace("image/png","image/octet-stream");
+		document.location.href=image;
+	}
+
 	function getClimYears()
 	// Take the clim_period variable, which contains the year bounds, and make 
 	// a list clim_years, containing all the years in between the bounds.

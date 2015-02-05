@@ -36,6 +36,12 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a id="settings">Settings</a></li>
+            <li class="dropdown"><a id="save_plot" class="dropdown-toggle" data-toggle="dropdown">Get plots</a>
+              <ul class="dropdown-menu">
+                <li id="dwnld_prob" class="dwnld_plt">Probability chart</li>
+                <li id="dwnld_pdf" class="dwnld_plt">PDF plot</li>
+              </ul>
+	    </li>
           </ul>
           <ul class="nav navbar-nav pull-right">
             <li class="active"><a href="forecast_tool.html">Forecast</a></li>
@@ -290,6 +296,7 @@
     <script src="jquery_ui/jquery-ui.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="flot/jquery.flot.js"></script>
+    <script src="flot/jquery.flot.canvas.js"></script>
     <script src="flot/jquery.flot.symbol.js"></script>
     <script src="flot/jquery.flot.pie.js"></script>
     <script src="flot/jquery.flot.axislabels.js"></script>
