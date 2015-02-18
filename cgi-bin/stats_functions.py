@@ -1,6 +1,20 @@
 import numpy
 import scipy.stats
 
+def sum_of_squares(data):
+    """
+    Calculate the sum of squares for an array like.
+    
+    Args:
+    
+    * data: array like
+    
+    Returns:
+        float
+    
+    """
+    return numpy.sum([x**2 for x in data])
+
 def spread_data(data, scale):
     """
     Spread all the data points (from the mean) by the given scale.
