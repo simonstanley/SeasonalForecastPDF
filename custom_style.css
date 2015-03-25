@@ -77,7 +77,9 @@
 }
 
 .adj_input {
-  margin-top: 7px;
+  margin: 5px;
+  height: 40px;
+  font-size: 20;
 }
 
 .form {
@@ -87,6 +89,10 @@
 .overwrites {
   height: 20px;
   width: 55px
+}
+
+.font_lg {
+  font-size: 30;
 }
 
 .help_main {

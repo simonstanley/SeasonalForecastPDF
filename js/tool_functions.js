@@ -1000,11 +1000,11 @@ $(document).ready(function(){
 				function(i, el)
 				{
 					var lab_point = bar_plot.pointOffset({x: el.data[0][0], y: el.data[0][1]});
-					$('<div class="data-point-label">' + (el.data[0][1]*100).toFixed(0) + '%</div>').css( 
+					$('<div class="data_point_label">' + (el.data[0][1]*100).toFixed(0) + '%</div>').css( 
 							{
 							    position: 'absolute',
-							    left: lab_point.left - 15,
-							    top: lab_point.top - 25,
+							    left: lab_point.left - 25,
+							    top: lab_point.top - 40,
 							    display: 'none'
 							}).appendTo(bar_plot.getPlaceholder()).fadeIn('slow');
 				});
