@@ -82,6 +82,10 @@
   font-size: 20;
 }
 
+.data_point_label {
+  font-size: 30;
+}
+
 .form {
   padding: 5px;
 }
