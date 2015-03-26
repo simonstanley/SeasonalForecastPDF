@@ -26,7 +26,8 @@ import numpy
 import os
 import json
 
-import_directory = '../example_data/'
+import_directory = '/home/h02/frgo/TEST/jhirst_plots/new_caboff_plots'\
+                   '/plots_N216/'
 export_directory = '/net/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data/'
 temp_directory   = '/home/h02/sstanley/temp/'
 

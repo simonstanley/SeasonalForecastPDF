@@ -459,7 +459,7 @@ $(document).ready(function(){
 	function exportData()
 	// Send data to Python script to save to file in specific format.
 	{
-		load_message('Exporting');
+	    load_message('Exporting');
 	    data_json = getExportJSON();
 	    $.post('cgi-bin/forecast_handler.py',
 	    		data_json,
@@ -530,14 +530,14 @@ $(document).ready(function(){
 		JSONobj.last_ten_years    = lst_ten_yrs;
 		JSONobj.clim_data         = clm_mem_vals;
 		JSONobj.fcast_data        = mod_mem_vals;
-		JSONobj.mem_numbers		  = mem_numbers;
+		JSONobj.mem_numbers       = mem_numbers;
 		JSONobj.pdf_points        = mod_pdf_pnts;
 		JSONobj.forecast_pdf_vals = mod_pdf_vals;
 		JSONobj.clim_pdf_vals     = clm_pdf_vals;
 		JSONobj.quintiles         = clm_quintles;
-		
+
         JSONtext = JSON.stringify(JSONobj);
-        return 'query='+JSONtext;        
+        return 'query='+JSONtext;
 	}
 	
 	//*****Plotting/displaying functions*****\\
@@ -1003,7 +1003,7 @@ $(document).ready(function(){
 					$('<div class="data_point_label">' + (el.data[0][1]*100).toFixed(0) + '%</div>').css( 
 							{
 							    position: 'absolute',
-							    left: lab_point.left - 25,
+							    left: lab_point.left - 30,
 							    top: lab_point.top - 40,
 							    display: 'none'
 							}).appendTo(bar_plot.getPlaceholder()).fadeIn('slow');
