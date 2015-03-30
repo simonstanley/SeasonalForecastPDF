@@ -539,6 +539,7 @@ $(document).ready(function(){
 		JSONobj.shift             = shift
 		JSONobj.blend             = blend
 		JSONobj.overwrites        = overwrites
+		JSONobj.probabilities     = mod_probs
 		
 		JSONtext = JSON.stringify(JSONobj);
 		return 'query='+JSONtext;        
