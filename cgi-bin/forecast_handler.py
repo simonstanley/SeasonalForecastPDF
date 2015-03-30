@@ -515,7 +515,9 @@ class ExportHandler(object):
         self.iss_month = iss_month.title()
         self.iss_year  = iss_year
         self.period    = period.lower()
-        self.export_dir  = export_dir
+        # Add a folder to the requested directory to contain all exported 
+        # files.
+        self.export_dir  = self._create_export_folder(export_dir)
         self.period_name = self._get_period_name()
 
         self.clim_data   = clim_data
@@ -543,6 +545,17 @@ class ExportHandler(object):
         self.overwrites = self._sort_overwrites(overwrites)
         
         self.info_dir   = self._create_info_folder()
+
+    def _create_export_folder(self, export_dir):
+        """
+        Create folder for all exports.
+        
+        """
+        export_dir = export_dir + "{m}{y}/".format(m=self.iss_month,
+                                                   y=self.iss_year)
+        if not os.path.exists(export_dir):
+            os.makedirs(export_dir)
+        return export_dir
 
     def _create_info_folder(self):
         """
