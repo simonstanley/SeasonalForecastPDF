@@ -77,88 +77,91 @@
       </div>
 
       <div class="col-sm-5 col-md-5 main">
-	<div class"row">
-	  <div class="col-sm-12 col-md-12 text-center">
-	    <h3 id="page_title">Press Import to start</h3>
-	  </div>
+
+	<!-- Message div -->
+        <div class"row">
+	<div class="col-sm-12 col-md-12 text-center">
+	  <h3 id="page_title">Press Import to start</h3>
 	</div>
-	<br>
-	<hr><br>
-	<div class"row">
+      </div>
 
-	  <div class="col-sm-4 col-md-4">
-	    <div class="row">
-	      <div class="col-sm-7 col-md-7">
-		<font class="font_lg" size="5">Spread</font>
-	      </div>
-	      <div class="col-sm-4 col-md-4">
-		<input class="adj_input" size="3" value=1 name="spread">
-	      </div>
-	    </div>
-	    <div class="row">
-	      <div class="col-sm-7 col-md-7">
-		<font class="font_lg" size="5">Shift</font>
-	      </div>
-	      <div class="col-sm-4 col-md-4">
-		<input class="adj_input" size="3" value=0 name="shift">
-	      </div>
-	    </div>
-	    <div class="row">
-	      <div class="col-sm-7 col-md-7">
-		<font class="font_lg" size="5">Blend&nbsp;</font><font size="4">(%)</font>
-	      </div>
-	      <div class="col-sm-4 col-md-4">
-		<input class="adj_input" size="3" value=0 name="blend">
-	      </div>
-	    </div>
-	    <br>
-	    <button id='update' type="button" class="btn btn-success btn-lg">Update</button><br><br>
-	  </div>
+	<div class"row" style="margin-top:7em;">
 
-	  <div class="col-sm-8 col-md-8">
-	    <div class="row">
-	      <div class="col-sm-offset-6 col-md-offset-6 col-sm-3 col-md-3">
-		<br>
+	    <!-- modifiers -->
+	    <div class="col-sm-6 col-md-6">
+
+		<div class="row">
+		  <div class="col-sm-6 col-md-6">
+		    <font class="font_lg" size="5">Spread</font>
+		  </div>
+		  <div class="col-sm-6 col-md-6">
+		    <input class="adj_input" size="3" value=1 name="spread">
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-sm-6 col-md-6">
+		    <font class="font_lg" size="5">Shift</font>
+		  </div>
+		  <div class="col-sm-6 col-md-6">
+		    <input class="adj_input" size="3" value=0 name="shift">
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-sm-6 col-md-6">
+		    <font class="font_lg" size="5">Blend&nbsp;</font><font size="4">(%)</font>
+		  </div>
+		  <div class="col-sm-6 col-md-6">
+		    <input class="adj_input" size="3" value=0 name="blend">
+		  </div>
+		</div>
+
+	    </div>
+
+	    <!-- import -->
+	    <div class="col-sm-offset-1 col-md-offset-1 col-sm-3 col-md-3 text-right">
 		<button id='import_data' type="button" class="btn btn-primary btn-lg">Import</button>
-	      </div>
-	      <div class="col-sm-3 col-md-3 ">
-		<br>
+	    </div>
+
+	    <!-- export -->
+	    <div class="col-sm-2 col-md-2">
 		<button id='export_data' type="button" class="btn btn-danger btn-lg">Export</button>
-	      </div>
 	    </div>
 
-	    <div class="row">
-	      <div class="col-sm-3 col-md-3">
-		<br>
-		<button id='mon_temp' type="button" value="mon_t2m" class="btn btn-default btn data_select">1M Temp</button>
-	      </div>
-	      <div class="col-sm-3 col-md-3 ">
-		<br>
-		<button id='mon_precip' type="button" value="mon_precip" class="btn btn-default btn data_select">1M Precip</button>
-	      </div>
-	      <div class="col-sm-3 col-md-3">
-		<br>
-		<button id='seas_temp' type="button" value="seas_t2m" class="btn btn-default btn data_select">3M Temp</button>
-	      </div>
-	      <div class="col-sm-3 col-md-3 ">
-		<br>
-		<button id='seas_precip' type="button" value="seas_precip" class="btn btn-default btn data_select">3M Precip</button>
-	      </div>
-	    </div>
+	</div>
 
+	<!-- Update + data tabs -->
+	<div class"row"  style="margin-top:19em;">
+	    <div class="col-sm-4 col-md-4">
+	      <button id='update' type="button" class="btn btn-success btn-lg">Update</button>
+	    </div>
+	    <div class="col-sm-2 col-md-2">
+	      <button id='mon_temp' type="button" value="mon_t2m" class="btn btn-default btn data_select">1M Temp</button>
+	    </div>
+	    <div class="col-sm-2 col-md-2">
+	      <button id='mon_precip' type="button" value="mon_precip" class="btn btn-default btn data_select">1M Precip</button>
+	    </div>
+	    <div class="col-sm-2 col-md-2">
+	      <button id='seas_temp' type="button" value="seas_t2m" class="btn btn-default btn data_select">3M Temp</button>
+	    </div>
+	    <div class="col-sm-2 col-md-2">
+	      <button id='seas_precip' type="button" value="seas_precip" class="btn btn-default btn data_select">3M Precip</button>
+	    </div>
+	</div>
+
+	<div class"row">
+
+	  <br>
+	  <div class="col-sm-12 col-md-12 text-center" id="prob_chart_area">
+	    <div id="prob_chart_title_area"><font size="5" id="prob_chart_title"></font><br></div>
+	    <div id="prob_chart"></div>
 	  </div>
+	</div>
 
-	</div>
       </div>
-      <div class"row">
-	<br>
-	<div class="col-sm-12 col-md-12 text-center" id="prob_chart_area">
-	  <div id="prob_chart_title_area"><font size="5" id="prob_chart_title"></font><br></div>
-	  <div id="prob_chart"></div>
-	</div>
-      </div>
+
     </div>
-
 </div>
 
 <div id="import_form" title="Import Data">
