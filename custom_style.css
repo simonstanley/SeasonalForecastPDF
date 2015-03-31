@@ -77,7 +77,13 @@
 }
 
 .adj_input {
-  margin-top: 7px;
+  margin: 5px;
+  height: 40px;
+  font-size: 20;
+}
+
+.data_point_label {
+  font-size: 30;
 }
 
 .form {
@@ -87,6 +93,10 @@
 .overwrites {
   height: 20px;
   width: 55px
+}
+
+.font_lg {
+  font-size: 30;
 }
 
 .help_main {

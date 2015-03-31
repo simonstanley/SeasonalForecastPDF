@@ -459,7 +459,7 @@ $(document).ready(function(){
 	function exportData()
 	// Send data to Python script to save to file in specific format.
 	{
-		load_message('Exporting');
+	    load_message('Exporting');
 	    data_json = getExportJSON();
 	    $.post('cgi-bin/forecast_handler.py',
 	    		data_json,
@@ -543,6 +543,7 @@ $(document).ready(function(){
 		
 		JSONtext = JSON.stringify(JSONobj);
 		return 'query='+JSONtext;        
+
 	}
 	
 	//*****Plotting/displaying functions*****\\
@@ -1005,11 +1006,11 @@ $(document).ready(function(){
 				function(i, el)
 				{
 					var lab_point = bar_plot.pointOffset({x: el.data[0][0], y: el.data[0][1]});
-					$('<div class="data-point-label">' + (el.data[0][1]*100).toFixed(0) + '%</div>').css( 
+					$('<div class="data_point_label">' + (el.data[0][1]*100).toFixed(0) + '%</div>').css( 
 							{
 							    position: 'absolute',
-							    left: lab_point.left - 15,
-							    top: lab_point.top - 25,
+							    left: lab_point.left - 30,
+							    top: lab_point.top - 40,
 							    display: 'none'
 							}).appendTo(bar_plot.getPlaceholder()).fadeIn('slow');
 				});
