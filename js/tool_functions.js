@@ -1122,7 +1122,7 @@ $(document).ready(function(){
 			if (overwrite_value != "")
 			{
 				overwrite_value = parseFloat(overwrite_value);
-				overwrites.push({"val_indx":i, "new_val":overwrite_value});
+				overwrites.push({"val_indx":i, "new_val":overwrite_value, "old_val":raw_mem_vals[i]});
 			}
 		}
 	}

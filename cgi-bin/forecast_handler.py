@@ -723,9 +723,11 @@ class ExportHandler(object):
         this to a string which tells us which value has been changed.
         
         """
-        new_overwrites = []
+        new_overwrites = ""
         for overwrite in overwrites:
-            new_overwrites.append(overwrite["new_val"])
+            new_overwrites += "({old} -> {new}); ".format(
+                                                   old=overwrite["old_val"],
+                                                   new=overwrite["new_val"])
         return new_overwrites
         
     def _create_data_string(self, all_data, num_of_lines, separator):
