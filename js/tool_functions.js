@@ -390,8 +390,8 @@ $(document).ready(function(){
 		    		data = JSON.parse(data);
 		    		if (data.status == 'success') 
 		    		{
-		    			raw_mem_vals = data.raw_forecast.values;
-		    			mem_numbers  = data.raw_forecast.mem_nums;
+		    		raw_mem_vals = data.raw_forecast.values;
+		    		mem_numbers  = data.raw_forecast.mem_nums;
 		                raw_pdf_vals = data.raw_forecast.pdf_vals;
 		                raw_pdf_pnts = data.raw_forecast.pdf_points;
 		                mod_mem_vals = data.raw_forecast.values;
@@ -535,9 +535,15 @@ $(document).ready(function(){
 		JSONobj.forecast_pdf_vals = mod_pdf_vals;
 		JSONobj.clim_pdf_vals     = clm_pdf_vals;
 		JSONobj.quintiles         = clm_quintles;
+		JSONobj.spread            = spread
+		JSONobj.shift             = shift
+		JSONobj.blend             = blend
+		JSONobj.overwrites        = overwrites
+		JSONobj.probabilities     = mod_probs
+		
+		JSONtext = JSON.stringify(JSONobj);
+		return 'query='+JSONtext;        
 
-        JSONtext = JSON.stringify(JSONobj);
-        return 'query='+JSONtext;
 	}
 	
 	//*****Plotting/displaying functions*****\\

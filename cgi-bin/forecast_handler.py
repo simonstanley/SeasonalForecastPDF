@@ -21,6 +21,7 @@ from stats_functions import pdf_percentile_boundaries, \
                             spread_data, \
                             shift_data, \
                             blend_data
+import matplotlib.pyplot as plt
 import scipy.stats
 import numpy
 import os
@@ -28,7 +29,7 @@ import json
 
 import_directory = '/home/h02/frgo/TEST/jhirst_plots/new_caboff_plots'\
                    '/plots_N216/'
-export_directory = '/net/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data/'
+export_directory = '/home/h02/sstanley/temp/'
 temp_directory   = '/home/h02/sstanley/temp/'
 
 VARS = ['precip', 't2m']
@@ -507,13 +508,16 @@ class ExportHandler(object):
     """
     def __init__(self, variable, iss_month, iss_year, period, last_ten_vals,
                   last_ten_years, clim_data, fcast_vals, mem_numbers,
-                  pdf_points, fcast_pdf_vals, clim_pdf_vals, percentiles,
+                  pdf_points, fcast_pdf_vals, clim_pdf_vals, percentiles, 
+                  probabilities, spread, shift, blend, overwrites, 
                   export_dir=''):
         self.variable  = variable.lower()
         self.iss_month = iss_month.title()
         self.iss_year  = iss_year
         self.period    = period.lower()
-        self.export_dir  = export_dir
+        # Add a folder to the requested directory to contain all exported 
+        # files.
+        self.export_dir  = self._create_export_folder(export_dir)
         self.period_name = self._get_period_name()
 
         self.clim_data   = clim_data
@@ -531,8 +535,38 @@ class ExportHandler(object):
          self.forecast_pdf_values) = self._sort_pdf_values(pdf_points,
                                                            clim_pdf_vals,
                                                            fcast_pdf_vals)
-        self.percentiles = sorted(percentiles)[::-1]
-        self.header_dict = self._create_header_dict()
+        self.percentiles   = sorted(percentiles)[::-1]
+        self.probabilities = probabilities
+        self.header_dict   = self._create_header_dict()
+        
+        self.spread     = spread
+        self.shift      = shift
+        self.blend      = blend
+        self.overwrites = self._sort_overwrites(overwrites)
+        
+        self.info_dir   = self._create_info_folder()
+
+    def _create_export_folder(self, export_dir):
+        """
+        Create folder for all exports.
+        
+        """
+        export_dir = export_dir + "{m}{y}/".format(m=self.iss_month,
+                                                   y=self.iss_year)
+        if not os.path.exists(export_dir):
+            os.makedirs(export_dir)
+        return export_dir
+
+    def _create_info_folder(self):
+        """
+        Create folder in which to put information about the forecast meeting.
+        
+        """        
+        info_dir = self.export_dir + "{m}{y}_info/".format(m=self.iss_month,
+                                                           y=self.iss_year)
+        if not os.path.exists(info_dir):
+            os.makedirs(info_dir)
+        return info_dir
 
     def _create_header_dict(self):
         """
@@ -683,6 +717,17 @@ class ExportHandler(object):
 
         return sorted_labels, sorted_data, num_of_lines
 
+    def _sort_overwrites(self, overwrites):
+        """
+        Overwrites are in the form {'val_indx': indx, 'new_val': val}. Convert
+        this to a string which tells us which value has been changed.
+        
+        """
+        new_overwrites = []
+        for overwrite in overwrites:
+            new_overwrites.append(overwrite["new_val"])
+        return new_overwrites
+        
     def _create_data_string(self, all_data, num_of_lines, separator):
         """
         Append all data to a string, filling gaps where columns have stopped
@@ -831,6 +876,24 @@ class ExportHandler(object):
                                                   y=self.iss_year,
                                                   v=self.variable)
 
+    def create_modifiers_filename(self):
+        """
+        For file containing the modification parameters.
+        
+        """
+        return '{m}{y}_modifications_info.txt'.format(m=self.iss_month,
+                                                      y=self.iss_year)
+
+    def create_probs_plot_filename(self):
+        """
+        For file containing the modification parameters.
+        
+        """
+        return 'probs_{m}{y}_{v}_{p}.png'.format(m=self.iss_month,
+                                                 y=self.iss_year,
+                                                 v=self.variable,
+                                                 p=self.period)
+
     def save_data(self, filename, data_headers, tab_spaces=1,
                    append_to_file=False, leave_space=False,
                    additional_labels=None):
@@ -898,6 +961,70 @@ class ExportHandler(object):
             filename = self._join_files(filename, original_filename, separator,
                                         tab_spaces, leave_space)
         return self.export_dir + filename
+
+    def save_modifiers(self, filename):
+        """
+        Create and append to file containing information on modifications used.
+        
+        """
+        pathname = self.info_dir + filename
+        # If file doesn't exist, initialise it with headers.
+        if not os.path.exists(pathname):
+            with open(pathname, 'w') as outfile:
+                outfile.write('PERIOD\tSPREAD\tSHIFT\tBLEND\tOVERWRITES\n')
+        
+        label = '%s%s' % (label_dict[self.period], label_dict[self.variable])
+        with open(pathname, 'r') as outfile:
+            lines_to_write = []
+            
+            # Check if entry has already been made
+            lines = outfile.readlines()
+            for line in lines:
+                if not line.split('\t')[0] == label:
+                    lines_to_write.append(line)
+            lines_to_write.append('{lab}\t{spr}\t{shf}\t{bld}\t{ovr}\n'\
+                                  .format(lab=label,
+                                          spr=self.spread,
+                                          shf=self.shift,
+                                          bld=self.blend,
+                                          ovr=self.overwrites))
+        with open(pathname, 'w') as outfile:
+            for line in lines_to_write:
+                outfile.write(line)
+
+    def plot_probs(self, filename):
+        """
+        Plot the probabilities (replicating the bar chart on the tool page).
+        
+        """
+        percent_probs = [prob*100. for prob in self.probabilities]
+        
+        if self.variable == 'precip':
+            colors = ["#7d5f4f", "#ae8f80", "#eeeeee", "#8099E6", "#507fbc"]
+        elif self.variable == 't2m':
+            colors = ["#3366ff", "#8099E6", "#cccccc", "#ff8080", "#ff0000"]
+        
+        ax = plt.axes()
+        
+        plt.bar(range(5), percent_probs, color=colors)
+        plt.axis(ymax=70)
+        plt.grid()
+        
+        plt.title("Forecast Probabilities")
+        plt.xlabel("Category")
+        xlabels = ["Lowest", "Low", "Middle", "High", "Highest"]
+        # Add white space to center labels.
+        xlabels = ["                   %s" % lab for lab in xlabels]
+        plt.xticks(range(5), xlabels)
+        ylabels = ["0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%"]
+        plt.yticks([0, 10, 20, 30, 40, 50, 60, 70], ylabels)
+        
+        for x, y in zip(range(5), percent_probs):
+            plt.text(x + 0.23, y + 1, "{prob}%".format(prob=int(round(y))), fontsize=18)
+        
+        plt.savefig(self.info_dir + filename)
+        plt.close()
+        
 
     def print_data_headers(self):
         """
@@ -1008,6 +1135,11 @@ def export_data(data_dict):
                              fcast_pdf_vals=data_dict['forecast_pdf_vals'],
                              clim_pdf_vals=data_dict['clim_pdf_vals'],
                              percentiles=data_dict['quintiles'],
+                             probabilities=data_dict['probabilities'],
+                             spread=data_dict['spread'],
+                             shift=data_dict['shift'],
+                             blend=data_dict['blend'],
+                             overwrites=data_dict['overwrites'],
                              export_dir=export_directory)
 
     # Create all filenames including temporary filenames for paired data.
@@ -1018,11 +1150,14 @@ def export_data(data_dict):
     paired_fname = exporter.create_paired_filename(period='seas')
     precip_pdf_filename = exporter.create_pdf_filename()
     dat_filename = exporter.create_dat_filename()
+    mods_filename = exporter.create_modifiers_filename()
+    probs_plot_filename = exporter.create_probs_plot_filename()
 
-    # If no .dat files exists, there should be no .csv files.
+    # If no .dat files exists, there should be no other files.
     if not exporter.saved_dat_files(VARS, PERS).any():
         for fname in [month_fname, seas_fname, paired_fname,
-                      precip_pdf_filename]:
+                      precip_pdf_filename, mods_filename,
+                      probs_plot_filename]:
             if os.path.exists(exporter.export_dir + fname):
                 os.remove(exporter.export_dir + fname)
 
@@ -1040,6 +1175,9 @@ def export_data(data_dict):
                                      'forecast_pdf',
                                      'percentiles'])
 
+    exporter.save_modifiers(mods_filename)
+    exporter.plot_probs(probs_plot_filename)
+
     temp_paired_fname = exporter.create_paired_filename(temporary=True)
     additional_lab = '%s %s' % (label_dict[exporter.period],
                                 label_dict[exporter.variable])
@@ -1054,6 +1192,12 @@ def export_data(data_dict):
                        additional_labels=[additional_lab,
                                           additional_lab])
 
+    # Make extra file for seasonal precipitation.
+    if exporter.variable == 'precip' and exporter.period == 'seas':
+        exporter.save_data(precip_pdf_filename, ['pdf_points',
+                                                 'clim_pdf',
+                                                 'forecast_pdf'])
+
     # If all .dat files exists, join paired files together.
     if exporter.saved_dat_files(VARS, PERS).all():
         temp_filename = exporter._join_files(seas_fname, month_fname,
@@ -1061,12 +1205,6 @@ def export_data(data_dict):
                                              leave_space=True)
         os.rename(exporter.export_dir + temp_filename,
                   exporter.export_dir + paired_fname)
-
-
-    if exporter.variable == 'precip' and exporter.period == 'seas':
-        exporter.save_data(precip_pdf_filename, ['pdf_points',
-                                                 'clim_pdf',
-                                                 'forecast_pdf'])
 
     response_dict = {'status'   : 'success',
                      'response' : exporter.export_dir + dat_filename}
@@ -1146,5 +1284,10 @@ if __name__ == '__main__':
 #                    '"pdf_points":[-3.4178217821782195,-3.293465346534655,-3.1691089108910906,-3.0447524752475266,-2.920396039603962,-2.7960396039603976,-2.671683168316833,-2.5473267326732687,-2.4229702970297042,-2.2986138613861398,-2.1742574257425757,-2.0499009900990113,-1.9255445544554468,-1.8011881188118826,-1.676831683168318,-1.5524752475247539,-1.4281188118811894,-1.303762376237625,-1.1794059405940605,-1.0550495049504964,-0.930693069306932,-0.8063366336633675,-0.681980198019803,-0.5576237623762386,-0.4332673267326741,-0.3089108910891101,-0.1845544554455456,-0.06019801980198114,0.06415841584158333,0.1885148514851478,0.3128712871287118,0.4372277227722763,0.5615841584158408,0.6859405940594052,0.8102970297029697,0.9346534653465342,1.0590099009900986,1.183366336633663,1.3077227722772267,1.4320792079207911,1.5564356435643556,1.68079207920792,1.8051485148514845,1.929504950495049,2.0538613861386135,2.178217821782178,2.3025742574257424,2.426930693069307,2.5512871287128713,2.675643564356435,2.7999999999999994,2.924356435643564,3.0487128712871283,3.173069306930693,3.2974257425742572,3.4217821782178217,3.546138613861386,3.6704950495049506,3.794851485148515,3.9192079207920787,4.043564356435644,4.167920792079208,4.2922772277227725,4.416633663366337,4.5409900990099015,4.665346534653466,4.78970297029703,4.914059405940595,5.038415841584159,5.162772277227724,5.287128712871288,5.411485148514853,5.535841584158417,5.660198019801982,5.784554455445546,5.908910891089109,6.033267326732673,6.157623762376238,6.281980198019802,6.406336633663367,6.530693069306931,6.655049504950496,6.77940594059406,6.903762376237625,7.028118811881189,7.1524752475247535,7.276831683168318,7.401188118811882,7.525544554455447,7.649900990099011,7.774257425742576,7.89861386138614,8.022970297029705,8.14732673267327,8.271683168316834,8.396039603960398,8.520396039603963,8.644752475247525,8.76910891089109,8.893465346534654,9.017821782178219],'\
 #                   '"forecast_pdf_vals":[0.00015231214064012594,0.00024342215221139694,0.0003796014642217655,0.0005776939579912344,0.0008581031636334616,0.0012443240915687307,0.001761866917923075,0.0024364980087330443,0.003291825975470943,0.004346395545245549,0.005610598896068065,0.007083841677756795,0.008752474321028504,0.010588988685031369,0.012552870271734216,0.014593292601795465,0.016653570043591606,0.018676991879604667,0.02061339354052216,0.022425626139248745,0.024094995873825558,0.025624779155884764,0.027041083880998826,0.02839061977019749,0.029735350060888493,0.031144496899046404,0.03268491192386082,0.03441131616127493,0.03635824260055676,0.038535552848950716,0.040929044730062814,0.043506891308535925,0.04623153291010289,0.04907537984879119,0.0520375615348732,0.05515828666684416,0.05852740271001589,0.062284555263097986,0.06660984562537342,0.07170577167382768,0.07777308768192394,0.08498458482444436,0.09346132430369901,0.10325539213415365,0.1143418734131081,0.12662077508842232,0.1399275215964795,0.15404890699796595,0.16874042592251973,0.18374095394139556,0.19878179388808795,0.21358889374303527,0.22787913394893805,0.24135345365330488,0.25369075445039874,0.2645466676847896,0.27356032779913064,0.2803704669634929,0.28463987537061974,0.2860851203633294,0.28450692404094124,0.2798161298200165,0.2720508387374854,0.26138186805484875,0.24810575187756972,0.23262654357331794,0.21542922909864023,0.1970483418887678,0.17803535304263482,0.15892778674950755,0.1402221007166297,0.12235149939957503,0.1056692335417381,0.09043764032244389,0.0768231001584948,0.06489704940848472,0.05464301895692701,0.04596927706576642,0.03872607278034851,0.03272584324324587,0.02776425673712284,0.02363978513224099,0.020169723992550768,0.01720118184714064,0.014616413420232684,0.012332783461511784,0.010298421786569156,0.00848511870572527,0.0068801484021715495,0.005478520205172636,0.004276738155403808,0.0032686268984036177,0.0024432830783678626,0.001784829819853082,0.0012734338130542535,0.0008869891771019406,0.0006029441236149091,0.00039989290977385033,0.00025872408075693835,0.00016326599528193066,0.00010047892696109695],'\
 #                    '"clim_pdf_vals":[0.0006387047465874883,0.000901493770764208,0.001247365063065634,0.001691973956211465,0.0022499068481562578,0.0029329757747164216,0.003748253994105419,0.0046960372006083105,0.005767986668696713,0.006945759566498768,0.008200442053569325,0.009493060820721511,0.010776354462722479,0.011997843954904181,0.013104068963667025,0.014045680035565477,0.014782926314252837,0.01529098255918276,0.015564537394186324,0.015621122776976634,0.015502793085650151,0.015275937948996478,0.01502920499319505,0.014869685551963852,0.014917653637545786,0.015300234036421037,0.01614441127794324,0.017569791016411877,0.01968150843672844,0.022563662462821547,0.026273649523878,0.030837774232536513,0.036248512668223494,0.04246377560041544,0.049408441877425074,0.05697829147026713,0.06504626210988704,0.0734706990518205,0.08210499679450184,0.09080778907414992,0.0994526777515164,0.10793644527291009,0.11618479684106132,0.12415493153497821,0.13183462280303487,0.1392379470106453,0.1463982616661761,0.153359420408582,0.1601664436258851,0.1668568886644047,0.1734539669632099,0.17996206839242126,0.18636485158629426,0.19262555096298575,0.19868875335695613,0.2044827078557924,0.20992130433248837,0.2149051792448307,0.21932190580411345,0.22304577243924034,0.22593809911055004,0.22784925093612238,0.2286233992474658,0.22810664402235128,0.2261584236837789,0.2226653418424259,0.21755581510335323,0.2108134647824422,0.2024870637495098,0.19269515497813075,0.18162413834272167,0.16951955428595283,0.15667130259204845,0.14339443376982405,0.13000777831237642,0.11681293274901561,0.10407597396595614,0.09201377323871458,0.08078603708190597,0.07049335535083222,0.06118073380661023,0.05284545113743623,0.04544768932442452,0.03892227015445601,0.03318996912687152,0.028167211569487687,0.02377340204058336,0.01993560919674012,0.01659074687165098,0.013685702800589833,0.01117604176027965,0.009023950131046617,0.007196016900140396,0.005661299041659134,0.004389938947363643,0.003352426298052663,0.00251945473024431,0.001862230329151284,0.0013530472166588146,0.000965948157720451,0.0006773219837017489],'\
-#                    '"quintiles":[2.246563473504463,3.394598625920879,4.306246004908942,5.239616417354868]}'
+#                    '"quintiles":[2.246563473504463,3.394598625920879,4.306246004908942,5.239616417354868],'\
+#                    '"probabilities":[0.22,0.18,0.15,0.2,0.25],'\
+#                    '"spread":"1",'\
+#                    '"shift":"0",'\
+#                    '"blend":"0",'\
+#                    '"overwrites":[{"val_indx":3,"new_val":4.3}, {"val_indx":2,"new_val":2.3}]}'
 #    main(export_json)
