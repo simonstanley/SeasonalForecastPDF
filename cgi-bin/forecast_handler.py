@@ -29,8 +29,8 @@ import json
 
 import_directory = '/home/h02/frgo/TEST/jhirst_plots/new_caboff_plots'\
                    '/plots_N216/'
-test_dir = "/home/h02/sstanley/temp/"
-oper_dir = "/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data"
+testing_dir = "/home/h02/sstanley/temp/"
+operational_dir = "/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data"
 
 
 VARS = ['precip', 't2m']
@@ -1125,9 +1125,9 @@ def export_data(data_dict):
 
     """
     if data_dict['export_directory'] == 'operational':
-        export_dir = oper_dir
+        export_dir = operational_dir
     elif data_dict['export_directory'] == 'testing':
-        export_dir = test_dir
+        export_dir = testing_dir
     
     exporter = ExportHandler(variable=data_dict['variable'],
                              iss_month=data_dict['iss_month'],

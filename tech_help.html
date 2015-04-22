@@ -75,17 +75,27 @@
       <ol>
         <li><b>import_directory</b> - This is the only directory that MUST be correct. The tool loads all the initial data from this directory and expects a very specific file format. At time of writing, this folder is:<br><br>
         /home/h02/frgo/TEST/jhirst_plots/new_caboff_plots/plots_N216/</li><br>
-        <li><b>export_directory</b> - This is the directory where the outputs are saved. This can be any directory. <i>Note, when exporting with the tool, you are told exactly where the output files have beed saved, which will be in the directory specified here.</i></li><br>
-        <li><b>temp_directory</b> - When building the output files, temporary files are created (and then deleted once not needed). Here you can specify which folder this is done in. A simple option is to set this to be the same as the export_directory.</li><br>
+        <li><b>operational_dir</b> - The directory for exported data when working operationally.</li><br>
+        <li><b>testing_dir</b> - The directory for exported data when testing.</li>
       </ol>
-      <br>
+      <i>Note, the choice between using the operational and the testing directory is made in the settings, before data is imported. When exporting with the tool, you are told the filepath where the output files have beed saved.</i>
+      <br><br>
 
 
 	    <h1 id="run_tool">Running the tool</h1><br>
 	    <p>All the code for the tool is self contained in a folder called SeasonalForecastPDF. This is located here (at the time of writing):<br><br>
 	    /net/home/h02/sstanley/packages/SeasonalForecastPDF/<br><br>
-	    To run the Python scripts which fetch the data, the page requires a server. As it happens, Python has a module which turns any computer into a simple server, perfect for these purposes.<br>
-            To get the server running, follow these steps:</p><br>
+	    To run the Python scripts which fetch the data, the page requires a server. As it happens, Python has a module which turns any computer into a simple server, perfect for these purposes.</p>
+	    <p>The simplist way to do this is to run the shell script <i>fcst_tool_server.sh</i> found in the SeasonalForecastPDF directory:</p>
+	    <ol>
+	      <li><p>Open up a terminal and run:</p>
+	      <p style='font-family:"Courier New", Courier, monospace'>/net/home/h02/sstanley/packages/SeasonalForecastPDF/fcst_tool_server.sh</p></li>
+	      <p><i>Note, this is assuming the SeasonalForecastPDF directory has not been moved.</i></p>
+	    </ol>
+            <p>You should get a message something like "Serving HTTP on 0.0.0.0 port 8000 ...". Printed just above this is the url to the forecast tool, something like "http://eld123:8000/forecast_tool.html".</p>
+	    <br>
+
+	    <p>If for some reason the script is not working, you can get the server running mannually with follow these steps:</p>
 	    <ol>
 	      <li><p>Open up a terminal and move to the tool's directory. This is the above directory unless it has been moved.</p>
 	      <p style='font-family:"Courier New", Courier, monospace'>cd /net/home/h02/sstanley/packages/SeasonalForecastPDF/</p></li>

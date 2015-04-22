@@ -157,9 +157,9 @@
 	      <li><b>PDF plotting levels</b> - A PDF is a function. To plot it, x values must be given to the function to produce y values. The number of plotting levels is simply how many x values are fed to the function along the range. The more levels, the smoother the plot will look. Like with the range limiter (above), this only affects the visual (as any calculations use the actual function, not these xy values).</li>
 	      <li><b>Probability plot</b> - Choose whether to display the resulting forecast probabilities on a bar chart (default) or pie chart.</li>
 	      <li><b>Climatology period</b> - Choose the period which acts as the reference to normal conditions. In general a 30 year period is large enough to represent the true spread and small enough to exclude any trends.</li>
-	      <li><b>Raw data only</b> - If ticked (default), only data before any previous modification is read in. If unticked, the lastest version of data is read in, i.e. if data has been previously modified, this version is imported - with no reference to the unmodified data - if no modified data exists, raw data is imported.</li>
+	      <li><b>Export directory</b> - Choose where the exported data is saved. <i>Note, the location of each directory is set in the Python module, see <a href="tech_help.html#set_up">Technical Help</a> for how to change these.</i></li>
 	    </ul>
-	    <p><i>Note, all but the climatology period and the raw data only option can be changed and updated after loading in the data, use </i><button type="button" class="btn btn-success btn-xs">Update</button><i> to implement the changes.</i></p><br>
+	    <p><i>Note, all but the climatology period and the export directory can be changed and updated after loading in the data, use </i><button type="button" class="btn btn-success btn-xs">Update</button><i> to implement the changes.</i></p><br>
 
 	    <h1 id="export">Exporting</h1><br>
 	    <p>Once you are happy with a forecast, simply press <button type="button" class="btn btn-danger btn-xs">Export</button> and the data for that variable and period (given by the current <a href="#data_tabs">data tab</a>) will be saved to file. The file location is then displayed on screen.</p><br>
