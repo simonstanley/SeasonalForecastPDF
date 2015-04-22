@@ -37,7 +37,7 @@ var overwrites = new Array();
 // Settings
 var levels = 101;
 var range_limiter = 40;
-var bandwidth = "silverman";
+var bandwidth = 0.6;
 var clim_period = [1981,2010];
 var clim_years  = new Array();
 var raw_data = true;
