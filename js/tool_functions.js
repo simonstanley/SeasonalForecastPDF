@@ -40,9 +40,12 @@ var range_limiter = 40;
 var bandwidth = 0.6;
 var clim_period = [1981,2010];
 var clim_years  = new Array();
-var raw_data = true;
 var bounds_from = "pdf";
 var prob_plot = "bar";
+var export_dir = "operational";
+
+// Export directory must be fixed once data is loaded.
+var export_dir_fixed = false;
 
 // Initialize dialog boxes (pop up forms)
 var import_dialog;
@@ -154,6 +157,7 @@ $(document).ready(function(){
 				$("[name='clim_to']").val(clim_period[1]);
 				$("#"+bounds_from).prop("checked", true);
 				$("#"+prob_plot).prop("checked", true);
+				$("#"+export_dir).prop("checked", true);
 				if (bandwidth != "silverman" && bandwidth != "scott") 
 				{
 					$("[name='given_bandwidth']").val(bandwidth);
@@ -162,7 +166,6 @@ $(document).ready(function(){
 				{
 					$("#"+bandwidth).prop("checked", true);
 				}
-				$("[name='raw_data']").prop('checked', raw_data);
 				setting_dialog.dialog("open");
 			});
 	
@@ -216,7 +219,7 @@ $(document).ready(function(){
 	setting_dialog = $("#setting_form").dialog(
 			{
 				autoOpen: false,
-				height: 535,
+				height: 555,
 				width: 600,
 				modal: true,
 				buttons: 
@@ -307,12 +310,22 @@ $(document).ready(function(){
 		{	
 			levels = parseFloat($("[name='levels']").val());
 		}
-
+		if ($("[name='export_dir']:checked").val() != export_dir)
+		{
+			if (export_dir_fixed == true)
+			{
+				valid = false;
+				message += "Cannot change export directory after data has been imported";
+			}
+			else
+			{
+				export_dir = $("[name='export_dir']:checked").val();
+			}
+		}
 		if (valid)
 		{
 			bounds_from = $("[name='boundaries']:checked").val();
 			prob_plot   = $("[name='prob_plot']:checked").val();
-			raw_data    = $("[name='raw_data']").is(":checked");
 			if ($("[name='given_bandwidth']").val() == "") 
 			{
 				bandwidth = $("[name='bandwidth']:checked").val();
@@ -381,7 +394,7 @@ $(document).ready(function(){
 	// Send parameter data to Python script to load and return all relevant 
 	// data.
 	{	 
-		load_message('Importing');
+	    load_message('Importing');
 	    data_json = getLoadJSON();
 	    $.post('cgi-bin/forecast_handler.py',
 	    		data_json,
@@ -408,6 +421,7 @@ $(document).ready(function(){
 		                show_data();
 		                updateTitle();
 		                done_loading();
+				export_dir_fixed = true;
 	                	$("#update").prop('disabled', false);
 	                	$("#export_data").prop('disabled', false);
 	                	if (update == true) 
@@ -492,7 +506,6 @@ $(document).ready(function(){
 		JSONobj.range_limiter = range_limiter;
 		JSONobj.bandwidth     = bandwidth;
 		JSONobj.clim_period   = clim_period;
-		JSONobj.raw_data      = raw_data;
 		JSONobj.bounds_from   = bounds_from;
 
         JSONtext = JSON.stringify(JSONobj);
@@ -535,11 +548,12 @@ $(document).ready(function(){
 		JSONobj.forecast_pdf_vals = mod_pdf_vals;
 		JSONobj.clim_pdf_vals     = clm_pdf_vals;
 		JSONobj.quintiles         = clm_quintles;
-		JSONobj.spread            = spread
-		JSONobj.shift             = shift
-		JSONobj.blend             = blend
-		JSONobj.overwrites        = overwrites
-		JSONobj.probabilities     = mod_probs
+		JSONobj.spread            = spread;
+		JSONobj.shift             = shift;
+		JSONobj.blend             = blend;
+		JSONobj.overwrites        = overwrites;
+		JSONobj.probabilities     = mod_probs;
+		JSONobj.export_directory  = export_dir;
 		
 		JSONtext = JSON.stringify(JSONobj);
 		return 'query='+JSONtext;        

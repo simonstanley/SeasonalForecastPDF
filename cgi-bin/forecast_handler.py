@@ -29,8 +29,9 @@ import json
 
 import_directory = '/home/h02/frgo/TEST/jhirst_plots/new_caboff_plots'\
                    '/plots_N216/'
-export_directory = '/home/h02/sstanley/temp/'
-temp_directory   = '/home/h02/sstanley/temp/'
+test_dir = "/home/h02/sstanley/temp/"
+oper_dir = "/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data"
+
 
 VARS = ['precip', 't2m']
 PERS = ['mon', 'seas']
@@ -225,7 +226,7 @@ class LoadData(object):
 
     """
     def __init__(self, main_dir, variable, period, iss_month, iss_year,
-                 clim_period=[1981, 2010], raw_data=False,
+                 clim_period=[1981, 2010], raw_data=True,
                  export_dir_only=False, export_dir=''):
 
         self.main_dir   = main_dir
@@ -1070,8 +1071,7 @@ def load_data(data_dict):
     """
     data = LoadData(import_directory, data_dict['variable'],
                     data_dict['period'], data_dict['iss_month'],
-                    data_dict['iss_year'], data_dict['clim_period'],
-                    data_dict['raw_data'], export_dir=export_directory)
+                    data_dict['iss_year'], data_dict['clim_period'])
 
     data_handler = ForecastPDFHandler(data.fcast_data, data.clim_data)
     data_handler.calculate_pdfs(data_dict['levels'],
@@ -1124,6 +1124,11 @@ def export_data(data_dict):
     been done.
 
     """
+    if data_dict['export_directory'] == 'operational':
+        export_dir = oper_dir
+    elif data_dict['export_directory'] == 'testing':
+        export_dir = test_dir
+    
     exporter = ExportHandler(variable=data_dict['variable'],
                              iss_month=data_dict['iss_month'],
                              iss_year=data_dict['iss_year'],
@@ -1142,7 +1147,7 @@ def export_data(data_dict):
                              shift=data_dict['shift'],
                              blend=data_dict['blend'],
                              overwrites=data_dict['overwrites'],
-                             export_dir=export_directory)
+                             export_dir=export_dir)
 
     # Create all filenames including temporary filenames for paired data.
     month_fname  = exporter.create_paired_filename(period='mon',
@@ -1257,7 +1262,6 @@ if __name__ == '__main__':
 #                '"range_limiter":40,'\
 #                '"bandwidth":"silverman",'\
 #                '"clim_period":[1981,2010],'\
-#                '"raw_data":true,'\
 #                '"bounds_from":"pdf"}'
 #    main(load_json)
 #
@@ -1292,4 +1296,5 @@ if __name__ == '__main__':
 #                    '"shift":"0",'\
 #                    '"blend":"0",'\
 #                    '"overwrites":[{"val_indx":3,"new_val":4.3}, {"val_indx":2,"new_val":2.3}]}'
+#                    '"export_directory":"testing"}'
 #    main(export_json)

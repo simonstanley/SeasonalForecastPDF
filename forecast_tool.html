@@ -278,13 +278,14 @@
 
       <div class="row form">
 	<div class="col-sm-4 col-md-4">
-	  <label>Raw data only</label>
+	  <label>Export directory</label>
 	</div>
-	<div class="col-sm-3 col-md-3">
-	  <input type="checkbox" name="raw_data">
+	<div class="col-sm-8 col-md-8">
+	  <input type="radio" name="export_dir" value="operational" id="operational"> Operational directory<br>
+	  <input type="radio" name="export_dir" value="testing" id="testing"> Test directory
+	  
 	</div>
       </div>
-
 
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
