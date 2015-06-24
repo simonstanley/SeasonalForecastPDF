@@ -25,12 +25,14 @@ import matplotlib.pyplot as plt
 import scipy.stats
 import numpy
 import os
+import shutil
 import json
 
 import_directory = '/home/h02/frgo/TEST/jhirst_plots/new_caboff_plots'\
                    '/plots_N216/'
 testing_dir = "/home/h02/sstanley/temp/"
-operational_dir = "/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data/"
+operational_dir = "/windows/m-drive/metoffice/Production/Operations_Centre"\
+                  "/_Public_Write/3_Month_Outlook/Exported_Data/"
 
 
 VARS = ['precip', 't2m']
@@ -93,6 +95,80 @@ def convert_dictionary_to_json(dictionary):
     """
     return json.dumps(dictionary, sort_keys=True, indent=4,
                       separators=(',', ': '))
+
+def extend_filename(filename, addition):
+    """
+    Add a string to the given filename but placing it before the extension
+    if there is one.
+
+    """
+    filename_parts = filename.split('.')
+    if len(filename_parts) == 1:
+        index = 0
+    else:
+        index = -2
+    filename_parts[-2] = filename_parts[index] + addition
+    return '.'.join(filename_parts)
+
+def join_files(export_dir, filename, original_filename, separator, tab_spaces,
+                 leave_space):
+    """
+    Join the contents of the two files by placing the new data (filename)
+    in new columns to the right of the existing data (original_filename).
+
+    """
+    if tab_spaces:
+        full_separator = separator * tab_spaces
+    else:
+        full_separator = separator
+    # Create a new file in which to write the contents of the original
+    # and additional data files together.
+    temp_filename = extend_filename(filename, 'temp')
+    with open(export_dir + original_filename, 'r') as orig_file:
+        with open(export_dir + filename, 'r') as additional_file:
+            orig_file_lines = orig_file.readlines()
+            add_file_lines  = additional_file.readlines()
+            # Both files must contain the same number of lines to merge
+            # properly.
+            num_of_lines = max(len(orig_file_lines),
+                               len(add_file_lines))
+            orig_diff = num_of_lines - len(orig_file_lines)
+            add_diff  = num_of_lines - len(add_file_lines)
+            if orig_diff > 0:
+                # Account for \n string which adds one to line length.
+                line_length = len(
+                              orig_file_lines[0].split(full_separator)) \
+                              - 1
+                orig_file_lines += [full_separator * line_length + '\n'] \
+                                   * orig_diff
+            elif add_diff > 0:
+                line_length = len(
+                              add_file_lines[0].split(full_separator)) \
+                              - 1
+                add_file_lines += [full_separator * line_length + '\n'] \
+                                  * add_diff
+            if not leave_space:
+                # If a space is not required between columns, the
+                # separator can now be changed to blank (it's original
+                # value is no longer needed for the rest of this function).
+                full_separator = ''
+
+            with open(export_dir + temp_filename, 'w') as outfile:
+                for i in xrange(num_of_lines):
+                    # Remove \n from each line of original file with
+                    # [:-1] and replace with the separator.
+                    orig_file_lines[i] = orig_file_lines[i][:-1] + \
+                                         full_separator + \
+                                         add_file_lines[i]
+                    outfile.write(orig_file_lines[i])
+    # Remove what are now old files.
+    os.remove(export_dir + original_filename)
+    os.remove(export_dir + filename)
+    # Rename the temporary file with the original filename,
+    os.rename(export_dir + temp_filename,
+              export_dir + original_filename)
+    return original_filename
+
 
 def load_response(fcast_data, mem_nums, fcast_pdf_vals, fcast_probs,
                    climatology, clim_pdf_vals, pdf_points, clim_quintiles,
@@ -465,7 +541,79 @@ class ForecastPDFHandler(object):
                                          blend)
 
 
-class ExportHandler(object):
+class DataManager(object):
+    """
+    
+    """
+    def __init__(self, iss_month, iss_year, export_dir):
+        self.iss_month  = iss_month.title()
+        self.iss_year   = iss_year
+        self.export_dir = self._create_export_folder(export_dir)
+
+    def _create_export_folder(self, export_dir):
+        """
+        Create folder for all exports.
+        
+        """
+        export_dir = export_dir + "{m}{y}/".format(m=self.iss_month,
+                                                   y=self.iss_year)
+        if not os.path.exists(export_dir):
+            os.makedirs(export_dir)
+        return export_dir
+
+    def create_dat_filename(self, variable, period):
+        """
+        Create filename with format used for main .dat export files.
+
+        """
+        return '{m}{y}_{v}_adj{p}.dat'.format(m=self.iss_month,
+                                              y=self.iss_year,
+                                              v=variable,
+                                              p=period)
+
+    def create_paired_filename(self, period, variable="", temporary=False):
+        """
+        Create filename with format used for paired forecast .csv export files.
+
+        """
+        period_name = period_dict[self.iss_month][period]
+        if temporary:
+            temp = 'temp'
+        else:
+            temp = ''
+        return 'For_{v}{p}{y}_paired_forecasts{t}.csv'.format(v=variable,
+                                                              p=period_name,
+                                                              y=self.iss_year,
+                                                              t=temp)
+
+    def saved_dat_files(self, variables, periods):
+        """
+        Check to see if all combinations of data have been saved.
+
+        Args:
+
+        * variables: list
+            List of valid meteorological variable names.
+
+        * periods: list
+            List of valid period names.
+
+        Returns:
+            boolean
+
+        """
+        files_exist = []
+        for var in variables:
+            for period in periods:
+                test_filepath = self.export_dir + \
+                                self.create_dat_filename(var, period)
+                if os.path.exists(test_filepath):
+                    files_exist.append(True)
+                else:
+                    files_exist.append(False)
+        return numpy.array(files_exist)
+
+class ExportHandler(DataManager):
     """
     Class for saving forecast data in specific format.
 
@@ -546,17 +694,6 @@ class ExportHandler(object):
         self.overwrites = self._sort_overwrites(overwrites)
         
         self.info_dir   = self._create_info_folder()
-
-    def _create_export_folder(self, export_dir):
-        """
-        Create folder for all exports.
-        
-        """
-        export_dir = export_dir + "{m}{y}/".format(m=self.iss_month,
-                                                   y=self.iss_year)
-        if not os.path.exists(export_dir):
-            os.makedirs(export_dir)
-        return export_dir
 
     def _create_info_folder(self):
         """
@@ -644,20 +781,6 @@ class ExportHandler(object):
         clim_pdf_values = [pdf_dict[value]['clim_val'] for value in pdf_points]
         fcst_pdf_values = [pdf_dict[value]['fcst_val'] for value in pdf_points]
         return pdf_points, clim_pdf_values, fcst_pdf_values
-
-    def _extend_filename(self, filename, addition):
-        """
-        Add a string to the given filename but placing it before the extension
-        if there is one.
-
-        """
-        filename_parts = filename.split('.')
-        if len(filename_parts) == 1:
-            index = 0
-        else:
-            index = -2
-        filename_parts[-2] = filename_parts[index] + addition
-        return '.'.join(filename_parts)
 
     def _create_header_string(self, separator, length, header_str='OUTPUT'):
         """
@@ -781,95 +904,6 @@ class ExportHandler(object):
             outfile.write(additional_label_str)
         outfile.write(data_str)
 
-    def _join_files(self, filename, original_filename, separator, tab_spaces,
-                     leave_space):
-        """
-        Join the contents of the two files by placing the new data (filename)
-        in new columns to the right of the existing data (original_filename).
-
-        """
-        if tab_spaces:
-            full_separator = separator * tab_spaces
-        else:
-            full_separator = separator
-        # Create a new file in which to write the contents of the original
-        # and additional data files together.
-        temp_filename = self._extend_filename(filename, 'temp')
-        with open(self.export_dir + original_filename, 'r') as orig_file:
-            with open(self.export_dir + filename, 'r') as additional_file:
-                orig_file_lines = orig_file.readlines()
-                add_file_lines  = additional_file.readlines()
-                # Both files must contain the same number of lines to merge
-                # properly.
-                num_of_lines = max(len(orig_file_lines),
-                                   len(add_file_lines))
-                orig_diff = num_of_lines - len(orig_file_lines)
-                add_diff  = num_of_lines - len(add_file_lines)
-                if orig_diff > 0:
-                    # Account for \n string which adds one to line length.
-                    line_length = len(
-                                  orig_file_lines[0].split(full_separator)) \
-                                  - 1
-                    orig_file_lines += [full_separator * line_length + '\n'] \
-                                       * orig_diff
-                elif add_diff > 0:
-                    line_length = len(
-                                  add_file_lines[0].split(full_separator)) \
-                                  - 1
-                    add_file_lines += [full_separator * line_length + '\n'] \
-                                      * add_diff
-                if not leave_space:
-                    # If a space is not required between columns, the
-                    # separator can now be changed to blank (it's original
-                    # value is no longer needed for the rest of this function).
-                    full_separator = ''
-
-                with open(self.export_dir + temp_filename, 'w') as outfile:
-                    for i in xrange(num_of_lines):
-                        # Remove \n from each line of original file with
-                        # [:-1] and replace with the separator.
-                        orig_file_lines[i] = orig_file_lines[i][:-1] + \
-                                             full_separator + \
-                                             add_file_lines[i]
-                        outfile.write(orig_file_lines[i])
-        # Remove what are now old files.
-        os.remove(self.export_dir + original_filename)
-        os.remove(self.export_dir + filename)
-        # Rename the temporary file with the original filename,
-        os.rename(self.export_dir + temp_filename,
-                  self.export_dir + original_filename)
-        return original_filename
-
-    def create_dat_filename(self, variable=None, period=None):
-        """
-        Create filename with format used for main .dat export files.
-
-        """
-        if not variable:
-            variable = self.variable
-        if not period:
-            period = self.period
-        return '{m}{y}_{v}_adj{p}.dat'.format(m=self.iss_month,
-                                              y=self.iss_year,
-                                              v=variable,
-                                              p=period)
-
-    def create_paired_filename(self, period=None, temporary=False):
-        """
-        Create filename with format used for paired forecast .csv export files.
-
-        """
-        if period is None:
-            period = self.period
-        period_name = period_dict[self.iss_month][period]
-        if temporary:
-            temp = 'temp'
-        else:
-            temp = ''
-        return 'For_{p}{y}_paired_forecasts{t}.csv'.format(p=period_name,
-                                                           y=self.iss_year,
-                                                           t=temp)
-
     def create_pdf_filename(self):
         """
         Create filename with format used for PDF .csv export files.
@@ -951,7 +985,7 @@ class ExportHandler(object):
                 # To append the new data, firstly save it to a temporary file.
                 # The original and temporary files are later joined.
                 original_filename = filename
-                filename = self._extend_filename(filename, 'additional_data')
+                filename = extend_filename(filename, 'additional_data')
             else:
                 # If the file does not already exist, carry on as normal.
                 append_to_file = False
@@ -961,8 +995,8 @@ class ExportHandler(object):
                              additional_labels)
 
         if append_to_file:
-            filename = self._join_files(filename, original_filename, separator,
-                                        tab_spaces, leave_space)
+            filename = join_files(self.export_dir, filename, original_filename, 
+                                  separator, tab_spaces, leave_space)
         return self.export_dir + filename
 
     def save_modifiers(self, filename):
@@ -1036,33 +1070,6 @@ class ExportHandler(object):
         """
         for header in self.header_dict.keys():
             print header
-
-    def saved_dat_files(self, variables, periods):
-        """
-        Check to see if all combinations of data have been saved.
-
-        Args:
-
-        * variables: list
-            List of valid meteorological variable names.
-
-        * periods: list
-            List of valid period names.
-
-        Returns:
-            boolean
-
-        """
-        files_exist = []
-        for var in variables:
-            for period in periods:
-                test_filepath = self.export_dir + \
-                                self.create_dat_filename(var, period)
-                if os.path.exists(test_filepath):
-                    files_exist.append(True)
-                else:
-                    files_exist.append(False)
-        return numpy.array(files_exist)
 
 def load_data(data_dict):
     """
@@ -1150,42 +1157,39 @@ def export_data(data_dict):
                              export_dir=export_dir)
 
     # Create all filenames including temporary filenames for paired data.
-    month_fname  = exporter.create_paired_filename(period='mon',
-                                                   temporary=True)
-    seas_fname   = exporter.create_paired_filename(period='seas',
-                                                   temporary=True)
     paired_fname = exporter.create_paired_filename(period='seas')
     precip_pdf_filename = exporter.create_pdf_filename()
-    dat_filename = exporter.create_dat_filename()
+    dat_filename = exporter.create_dat_filename(exporter.variable,
+                                                exporter.period)
     mods_filename = exporter.create_modifiers_filename()
     probs_plot_filename = exporter.create_probs_plot_filename()
 
-    # If no .dat files exists, there should be no other files.
-    if not exporter.saved_dat_files(VARS, PERS).any():
-        for fname in [month_fname, seas_fname, paired_fname,
-                      precip_pdf_filename, mods_filename,
-                      probs_plot_filename]:
-            if os.path.exists(exporter.export_dir + fname):
-                os.remove(exporter.export_dir + fname)
-
+    # If the paired_fname file exists, this is a finalised
+    # directory. Remove it and start again.
+    if os.path.exists(exporter.export_dir + paired_fname):
+        # Remove everything  
+        shutil.rmtree(exporter.export_dir)
+        # Recreate folders.
+        os.makedirs(exporter.export_dir)
+        exporter._create_info_folder()
+    
     # Check the current .dat doesn't already exist.
     if os.path.exists(exporter.export_dir + dat_filename):
         os.remove(exporter.export_dir + dat_filename)
 
     # Save .dat file
     exporter.save_data(dat_filename, ['last_10_vals',
-                                     'last_10_years',
-                                     'clim_vals',
-                                     'forecast_vals',
-                                     'pdf_points',
-                                     'clim_pdf',
-                                     'forecast_pdf',
-                                     'percentiles'])
+                                      'last_10_years',
+                                      'clim_vals',
+                                      'forecast_vals',
+                                      'pdf_points',
+                                      'clim_pdf',
+                                      'forecast_pdf',
+                                      'percentiles'])
 
     exporter.save_modifiers(mods_filename)
     exporter.plot_probs(probs_plot_filename)
 
-    temp_paired_fname = exporter.create_paired_filename(temporary=True)
     additional_lab = '%s %s' % (label_dict[exporter.period],
                                 label_dict[exporter.variable])
     # Sort by member number order (sorting this list automatically re orders
@@ -1193,9 +1197,13 @@ def export_data(data_dict):
     exporter.fcast_data.mem_numbers = sorted(exporter.fcast_data.mem_numbers)
     # Reload the header dictionary to update reordering.
     exporter.header_dict = exporter._create_header_dict()
+    
+    
+    temp_paired_fname = exporter.create_paired_filename(period=exporter.period,
+                                                        variable=exporter.variable,
+                                                        temporary=True)
     exporter.save_data(temp_paired_fname, ['clim_vals',
                                            'forecast_vals'],
-                       append_to_file=True,
                        additional_labels=[additional_lab,
                                           additional_lab])
 
@@ -1205,16 +1213,63 @@ def export_data(data_dict):
                                                  'clim_pdf',
                                                  'forecast_pdf'])
 
-    # If all .dat files exists, join paired files together.
+    # If all .dat files exists, send back message that ok to finalise.
     if exporter.saved_dat_files(VARS, PERS).all():
-        temp_filename = exporter._join_files(seas_fname, month_fname,
-                                             separator=',', tab_spaces=None,
-                                             leave_space=True)
-        os.rename(exporter.export_dir + temp_filename,
-                  exporter.export_dir + paired_fname)
+        all_files = True
+    else:
+        all_files = False
+        
+    response_dict = {'status'    : 'success',
+                     'response'  : exporter.export_dir + dat_filename,
+                     'all_files' : all_files}
+    print_response(convert_dictionary_to_json(response_dict))
 
-    response_dict = {'status'   : 'success',
-                     'response' : exporter.export_dir + dat_filename}
+def finalise_data(data_dict):
+    """
+    
+    """
+    if data_dict['export_directory'] == 'operational':
+        export_dir = operational_dir
+    elif data_dict['export_directory'] == 'testing':
+        export_dir = testing_dir
+        
+    manager = DataManager(iss_month=data_dict['iss_month'],
+                          iss_year=data_dict['iss_year'],
+                          export_dir=export_dir)
+    
+    if manager.saved_dat_files(VARS, PERS).all():
+        
+        # Now must join together all temporary files.
+        t2m_mon_fname =  manager.create_paired_filename(period='mon',
+                                                        variable='t2m',
+                                                        temporary=True)
+        prp_mon_fname =  manager.create_paired_filename(period='mon',
+                                                        variable='precip',
+                                                        temporary=True)
+        t2m_seas_fname =  manager.create_paired_filename(period='seas',
+                                                         variable='t2m',
+                                                         temporary=True)
+        prp_seas_fname =  manager.create_paired_filename(period='seas',
+                                                         variable='precip',
+                                                         temporary=True)
+        # Create the final filename to use.
+        paired_fname = manager.create_paired_filename(period='seas')
+        
+        month_fname = join_files(manager.export_dir, t2m_mon_fname, prp_mon_fname,
+                                 separator=',', tab_spaces=None, leave_space=False)
+        
+        seas_fname  = join_files(manager.export_dir, t2m_seas_fname, prp_seas_fname,
+                                 separator=',', tab_spaces=None, leave_space=False)
+        
+        temp_filename = join_files(manager.export_dir, seas_fname, month_fname,
+                                   separator=',', tab_spaces=None, leave_space=True)
+        os.rename(manager.export_dir + temp_filename,
+                  manager.export_dir + paired_fname)
+    else:
+        raise UserWarning("Unable to finalise as not all required files "\
+                          "are available.")
+        
+    response_dict = {'status' : 'success'}
     print_response(convert_dictionary_to_json(response_dict))
 
 def main(str_json):
@@ -1236,6 +1291,9 @@ def main(str_json):
 
     elif data_dict['request_type'] == 'export_data':
         export_data(data_dict)
+    
+    elif data_dict['request_type'] == 'finalise_data':
+        finalise_data(data_dict)
 
 if __name__ == '__main__':
 

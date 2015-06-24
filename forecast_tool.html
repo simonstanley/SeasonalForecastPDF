@@ -55,7 +55,7 @@
 <div class="container-fluid">
     <div class="row">
 
-      <div class="col-sm-4 col-md-4 main text-center" id="pdf_plot">
+      <div class="col-sm-3 col-md-3 main text-center" id="pdf_plot">
       </div>
 
       <div class="col-sm-2 col-md-2 main text-center" id="data_display">
@@ -76,16 +76,16 @@
 	</div>
       </div>
 
-      <div class="col-sm-5 col-md-5 main">
+      <div class="col-sm-6 col-md-6 main">
 
 	<!-- Message div -->
-        <div class"row">
+        <div>
 	<div class="col-sm-12 col-md-12 text-center">
 	  <h3 id="page_title">Press Import to start</h3>
 	</div>
       </div>
 
-	<div class"row" style="margin-top:7em;">
+	<div class="row" style="margin-top:7em;">
 
 	    <!-- modifiers -->
 	    <div class="col-sm-6 col-md-6">
@@ -120,37 +120,49 @@
 	    </div>
 
 	    <!-- import -->
-	    <div class="col-sm-offset-1 col-md-offset-1 col-sm-3 col-md-3 text-right">
+	    <div class="col-sm-offset-1 col-md-offset-1 col-sm-3 col-md-3 text-left">
 		<button id='import_data' type="button" class="btn btn-primary btn-lg">Import</button>
 	    </div>
 
 	    <!-- export -->
 	    <div class="col-sm-2 col-md-2">
-		<button id='export_data' type="button" class="btn btn-danger btn-lg">Export</button>
+		<div class="row">
+		    <button id='export_data' type="button" class="btn btn-danger btn-lg">Export</button>
+		</div>
+
+		<div class="row" style="margin-top:1em;">
+		    <button id='finalise' type="button" class="btn btn-warning btn-lg">Finalise</button>
+		</div>
 	    </div>
 
 	</div>
 
-	<!-- Update + data tabs -->
-	<div class"row"  style="margin-top:19em;">
-	    <div class="col-sm-4 col-md-4">
+	<!-- Update -->
+	<div class="row">
+	    <div class="col-sm-5 col-md-5">
 	      <button id='update' type="button" class="btn btn-success btn-lg">Update</button>
 	    </div>
-	    <div class="col-sm-2 col-md-2">
-	      <button id='mon_temp' type="button" value="mon_t2m" class="btn btn-default btn data_select">1M Temp</button>
+	    
+	    <!-- Data tabs -->
+	    <div class="col-sm-7 col-md-7">
+		<div class="col-sm-3 col-md-3">
+		  <button id='mon_temp' type="button" value="mon_t2m" class="btn btn-default btn data_select">1M Temp</button>
+		</div>
+		<div class="col-sm-3 col-md-3">
+		  <button id='mon_precip' type="button" value="mon_precip" class="btn btn-default btn data_select">1M Precip</button>
+		</div>
+		<div class="col-sm-3 col-md-3">
+		  <button id='seas_temp' type="button" value="seas_t2m" class="btn btn-default btn data_select">3M Temp</button>
+		</div>
+		<div class="col-sm-3 col-md-3">
+		  <button id='seas_precip' type="button" value="seas_precip" class="btn btn-default btn data_select">3M Precip</button>
+		</div>
 	    </div>
-	    <div class="col-sm-2 col-md-2">
-	      <button id='mon_precip' type="button" value="mon_precip" class="btn btn-default btn data_select">1M Precip</button>
-	    </div>
-	    <div class="col-sm-2 col-md-2">
-	      <button id='seas_temp' type="button" value="seas_t2m" class="btn btn-default btn data_select">3M Temp</button>
-	    </div>
-	    <div class="col-sm-2 col-md-2">
-	      <button id='seas_precip' type="button" value="seas_precip" class="btn btn-default btn data_select">3M Precip</button>
-	    </div>
+
+
 	</div>
 
-	<div class"row">
+	<div class="row">
 
 	  <br>
 	  <div class="col-sm-12 col-md-12 text-center" id="prob_chart_area">

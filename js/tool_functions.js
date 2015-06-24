@@ -75,6 +75,7 @@ $(document).ready(function(){
 	// are enable when data has been imported.
 	$("#update").prop('disabled', true);
 	$("#export_data").prop('disabled', true);
+	$("#finalise").prop('disabled', true);
 	$(".data_select").prop('disabled', true);
 	
 	
@@ -90,6 +91,12 @@ $(document).ready(function(){
 			function() 
 			{
 				exportData();
+			});
+
+	$("#finalise").click(
+			function() 
+			{
+				finaliseData();
 			});
 	
 	$(".data_select").click(
@@ -484,6 +491,15 @@ $(document).ready(function(){
 	                {
 	                	done_loading();
 	                	$("#page_title").html('Data saved in: '+data.response);
+				if (data.all_files == true) 
+				{
+				    // Allow users to finalise export.
+				    $("#finalise").prop('disabled', false);
+				}
+				else
+				{
+				    $("#finalise").prop('disabled', true);
+				}
 	                }
 	                else if (data.status == 'failed') 
 	                {	
@@ -492,6 +508,32 @@ $(document).ready(function(){
 	                }
 	            });
 	}
+
+	function finaliseData()
+	// Send data to Python script to build final files.
+	{
+	    load_message('Finalising');
+	    data_json = getFinaliseJSON();
+	    $.post('cgi-bin/forecast_handler.py',
+	    		data_json,
+	            function(data, status) 
+	            {
+	                data = JSON.parse(data);
+	                if (data.status == 'success') 
+	                {
+	                	done_loading();
+	                	$("#page_title").html('All data saved and complete (to make further modifications please start over).');
+				$("#finalise").prop('disabled', true);
+	                }
+	                else if (data.status == 'failed') 
+	                {	
+	                	done_loading();
+	                	$("#page_title").html(data.response);
+	                }
+	            });
+	}
+
+
 	
 	//*****JSON building functions*****\\
 	function getLoadJSON() 
@@ -559,6 +601,20 @@ $(document).ready(function(){
 		return 'query='+JSONtext;        
 
 	}
+
+	function getFinaliseJSON() 
+	{
+		var JSONobj = {};
+		JSONobj.request_type      = "finalise_data";
+		JSONobj.iss_month         = month;
+		JSONobj.iss_year          = year;
+		JSONobj.export_directory  = export_dir;
+		
+		JSONtext = JSON.stringify(JSONobj);
+		return 'query='+JSONtext;        
+
+	}
+
 	
 	//*****Plotting/displaying functions*****\\
 	function show_data()
@@ -629,9 +685,9 @@ $(document).ready(function(){
 		var max_raw_pdf = Math.max.apply(Math, raw_pdf_vals);
 		var max_mod_pdf = Math.max.apply(Math, mod_pdf_vals);
 		var max_pdf_val = Math.max(max_clm_pdf, max_raw_pdf, max_mod_pdf);
-		var clim_xval    = max_pdf_val * -1.75;
-		var lst_ten_xval = max_pdf_val * -1.625;
-		var mod_xval     = max_pdf_val * -1.25;
+		var clim_xval    = max_pdf_val * -3;
+		var lst_ten_xval = max_pdf_val * -2.75;
+		var mod_xval     = max_pdf_val * -2;
 		
 		// Define background colours.
 		if (variable == 'precip') 
@@ -761,7 +817,7 @@ $(document).ready(function(){
 		{
 			xaxis: 
 			{
-				min: -2 * max_pdf_val,
+				min: -3.5 * max_pdf_val,
 				show: false
 			},
 			yaxis: 
