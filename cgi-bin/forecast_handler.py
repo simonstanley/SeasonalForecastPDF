@@ -30,7 +30,7 @@ import json
 import_directory = '/home/h02/frgo/TEST/jhirst_plots/new_caboff_plots'\
                    '/plots_N216/'
 testing_dir = "/home/h02/sstanley/temp/"
-operational_dir = "/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data"
+operational_dir = "/windows/m-drive/metoffice/Production/Operations_Centre/_Public_Write/3_Month_Outlook/Exported_Data/"
 
 
 VARS = ['precip', 't2m']
