@@ -761,7 +761,7 @@ $(document).ready(function(){
 				data: raw_pdf,
 				lines: 
 				{
-					lineWidth: line_width
+					lineWidth: 1.5
 				},
 				label: "Raw forecast"
 			},
@@ -825,7 +825,7 @@ $(document).ready(function(){
 				position: "right",
 				min: ymin
 			},
-			colors: ["#000000", "#aaaaaa", "#808080", "#ff00ff", "#000000", 
+			colors: ["#000000", "#aaaaaa", "#ffffff", "#ff00ff", "#000000", 
 			         "#ff00ff", "#000000", "#000000", "#000000", "#000000"],
 			grid: 
 			{

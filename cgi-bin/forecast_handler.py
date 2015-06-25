@@ -21,6 +21,7 @@ from stats_functions import pdf_percentile_boundaries, \
                             spread_data, \
                             shift_data, \
                             blend_data
+from plotting_functions import colour_map
 import matplotlib.pyplot as plt
 import scipy.stats
 import numpy
@@ -930,6 +931,17 @@ class ExportHandler(DataManager):
                                                  y=self.iss_year,
                                                  v=self.variable,
                                                  p=self.period)
+        
+    def create_pdf_plot_filename(self):
+        """
+        For file containing the modification parameters.
+        
+        """
+        return 'pdf_{m}{y}_{v}_{p}.png'.format(m=self.iss_month,
+                                               y=self.iss_year,
+                                               v=self.variable,
+                                               p=self.period)
+        
 
     def save_data(self, filename, data_headers, tab_spaces=1,
                    append_to_file=False, leave_space=False,
@@ -1063,6 +1075,69 @@ class ExportHandler(DataManager):
         plt.close()
         
 
+    def plot_pdfs(self, filename):
+        """
+        Plot the PDF plot (relicating the PDF plot on the tool page).
+        
+        """
+        plt.figure(figsize=(6,12))
+             
+        ax = plt.axes()
+        
+        max_pdf_val = max([max(self.forecast_pdf_values), 
+                           max(self.clim_pdf_values)])
+        max_x           = max_pdf_val * 3.5
+        clim_data_x     = [max_x - (max_pdf_val * 3)] * len(self.clim_data)
+        last_ten_vals_x = [max_x - (max_pdf_val * 2.75)] * len(self.last_ten_data.last_ten_vals)
+        fcast_vals_x    = [max_x - (max_pdf_val * 2)] * len(self.fcast_data.fcast_vals)
+        
+        # Invert the pdf vals so they plot on the right (at x = 1)
+        forecast_pdf_values = [max_x - val 
+                               for val in self.forecast_pdf_values]
+        clim_pdf_values     = [max_x - val 
+                               for val in self.clim_pdf_values]
+         
+        
+        plt.plot(clim_data_x, self.clim_data, 'x', color="#000000", ms=5, mew=1.8)
+        plt.plot(last_ten_vals_x, self.last_ten_data.last_ten_vals, 's', color="#aaaaaa", ms=5)
+        plt.plot(fcast_vals_x, self.fcast_data.fcast_vals, 'x', color="#ff00ff", ms=5, mew=1.8)
+        
+        plt.plot(forecast_pdf_values, self.pdf_points, color="#ff00ff", lw=2)
+        plt.plot(clim_pdf_values, self.pdf_points, color="#000000", lw=2)
+
+        min_pdf_x = min([min(forecast_pdf_values) ,min(clim_pdf_values)])
+        percentiles_x = [min_pdf_x, max_x]
+        for percentile in self.percentiles:
+            percentile_y = [percentile, percentile]
+            plt.plot(percentiles_x, percentile_y, color="#000000", lw=0.5)
+        
+        
+        plt.text(0.5, 0.94, '%s %s' % (label_dict[self.period], 
+                                       label_dict[self.variable]), 
+                 horizontalalignment='center',
+                 fontsize=20, transform=ax.transAxes)
+        
+        plt.axis(xmin=0, xmax=max_x)
+        
+        X = [[0., 0.],[1.,1.]]
+        
+        if self.variable == "precip":
+            colours = ["#97b3d7", '#eeeeee', "#c5afa4"]
+        else:
+            colours = ["#ffb4be", '#eeeeee', "#9bc9e5"]
+        cmap = colour_map(colours)
+        [ymin, ymax] = ax.get_ylim()
+        
+        ax.imshow(X, interpolation='bicubic', cmap=cmap, aspect="auto", 
+                  extent=(0, max_x, ymin, ymax), alpha=1)
+        
+        ax.grid(axis='y', ls='-', lw=0.1)
+        ax.xaxis.set_visible(False)
+        ax.yaxis.tick_right()
+        
+        plt.savefig(self.info_dir + filename)
+        plt.close()
+
     def print_data_headers(self):
         """
         Print all valid data headers.
@@ -1163,6 +1238,7 @@ def export_data(data_dict):
                                                 exporter.period)
     mods_filename = exporter.create_modifiers_filename()
     probs_plot_filename = exporter.create_probs_plot_filename()
+    pdf_plot_filename   = exporter.create_pdf_plot_filename()
 
     # If the paired_fname file exists, this is a finalised
     # directory. Remove it and start again.
@@ -1189,6 +1265,7 @@ def export_data(data_dict):
 
     exporter.save_modifiers(mods_filename)
     exporter.plot_probs(probs_plot_filename)
+    exporter.plot_pdfs(pdf_plot_filename)
 
     additional_lab = '%s %s' % (label_dict[exporter.period],
                                 label_dict[exporter.variable])
